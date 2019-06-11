@@ -32,7 +32,7 @@ export default function drawPie(chart, layer, s, index) {
   let pieItems = layer.selectAll('path.lc-arc')
     .data(arcs)
     .join('path.lc-arc')
-    .attr('d', d3arc)
+    //.attr('d', d3arc)
     .attr('item-index', (d, i) => i)
     .attr('fill', (d, i) => {
       return defaultOptions.getColor(i)
@@ -100,5 +100,14 @@ export default function drawPie(chart, layer, s, index) {
           }
         })
 
+    })
+    .transition()
+    .duration(defaultOptions.enterAniDuration)
+    .ease(defaultOptions.enterAniEase)
+    .attrTween('d', function (d, i) {
+      let inter = d3.interpolate(d.startAngle, d.endAngle)
+      return t => {
+        return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
+      }
     })
 }
