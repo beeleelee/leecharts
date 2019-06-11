@@ -174,6 +174,8 @@ class chart {
 
     let chart = this
 
+    this.highlightIndex = null
+
     this.paper = this.container.append('svg.lc-root')
 
     this.figureGeometry()

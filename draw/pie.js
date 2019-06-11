@@ -13,7 +13,6 @@ export default function drawPie(chart, layer, s, index) {
     containerWidth: cw,
     containerHeight: ch,
     containerCenter: cc,
-    highlightIndex,
   } = chart
   let data = s.data
   if (!data || !data.length) return
@@ -30,46 +29,76 @@ export default function drawPie(chart, layer, s, index) {
 
 
   layer.attr('transform', `translate(${pieCenter[0]}, ${pieCenter[1]})`)
-  layer.selectAll('path.lc-arc')
+  let pieItems = layer.selectAll('path.lc-arc')
     .data(arcs)
     .join('path.lc-arc')
     .attr('d', d3arc)
+    .attr('item-index', (d, i) => i)
     .attr('fill', (d, i) => {
       return defaultOptions.getColor(i)
     })
     .on('click', function (d, i) {
-      if (i === highlightIndex) return
+      let highlightIndex
 
+      if (i === chart.highlightIndex) {
+        highlightIndex = null
+      } else {
+        highlightIndex = i
+      }
 
-      emitter.emit('highlightChange', i)
+      chart.highlightIndex = highlightIndex
+      emitter.emit('highlightChange', highlightIndex)
+
+      let curEle = d3.select(this)
+      let otherPieItems = pieItems.filter((d, index) => index !== i)
+
+      if (highlightIndex === null) {
+        otherPieItems.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', 1)
+
+      } else {
+        otherPieItems.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', 0.4)
+        curEle.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', 1)
+      }
+
     })
     .on('mouseover', function (d, i) {
-      console.log(d, i)
       let ele = d3.select(this)
+
       let startOuter = outerRadius
       let endOuter = outerRadius * defaultOptions.focusRate
       ele.transition()
         .duration(defaultOptions.focusAniDuration)
         .ease(defaultOptions.focusPieEase)
         .attrTween('d', () => {
+          let d = arcs[i]
           let inter = d3.interpolate(startOuter, endOuter)
           return t => {
             return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
           }
         })
+
     })
     .on('mouseout', function (d, i) {
       let ele = d3.select(this)
+
       let startOuter = outerRadius * defaultOptions.focusRate
       let endOuter = outerRadius
       ele.transition()
         .duration(defaultOptions.focusAniDuration)
         .ease(defaultOptions.focusPieEase)
         .attrTween('d', () => {
+          let d = arcs[i]
           let inter = d3.interpolate(startOuter, endOuter)
           return t => {
             return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
           }
         })
+
     })
 }
