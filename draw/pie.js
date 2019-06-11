@@ -1,5 +1,6 @@
 import {
   isSet,
+  isFunction,
 } from 'mytoolkit'
 import {
   parsePercent
@@ -110,4 +111,11 @@ export default function drawPie(chart, layer, s, index) {
         return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
       }
     })
+
+  // draw label 
+  if (s.label && isFunction(s.label.formatter)) {
+    let label = layer.safeSelect('g.lc-pie-label')
+
+    label.html(s.label.formatter(data))
+  }
 }
