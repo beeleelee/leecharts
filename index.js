@@ -10,6 +10,7 @@ import {
 import {
   isArray,
   isFunction,
+  debounce,
 } from 'mytoolkit'
 
 import drawAxisX from './draw/axisX'
@@ -35,6 +36,8 @@ class chart {
     this.previousOptions = null
     this.sections = {}
 
+    let resize = this.resize.bind(this)
+    this.resize = debounce(resize, 100)
     this.init()
     this.drawChart()
 
@@ -148,24 +151,32 @@ class chart {
       .attr('y2', ch - grid.top)
 
   }
-  drawAxisY() {
-
+  resize() {
+    this.figureGeometry()
+    this.drawChart()
+  }
+  figureGeometry() {
+    let {
+      width,
+      height
+    } = getBoundingRect(this.container.node())
+    let cw = this.containerWidth = width
+    let ch = this.containerHeight = height
+    this.containerCenter = [cw / 2, ch / 2]
+    this.paper.attrs({ width: cw, height: ch })
+    console.log(cw, ch)
   }
   init() {
     if (!this.container) return
     if (this.container.empty && this.container.empty()) return
 
     let chart = this
-    let {
-      width,
-      height
-    } = getBoundingRect(this.container.node())
-
-    this.containerWidth = width
-    this.containerHeight = height
 
     this.paper = this.container.append('svg.lc-root')
-      .attrs({ width: this.containerWidth, height: this.containerHeight })
+
+    this.figureGeometry()
+
+    this.paper
       .on('mousemove', function () {
         chart.__onMousemove()
       })
@@ -205,10 +216,13 @@ class chart {
       scaleX,
       activeCategroryIndex,
     } = this
+    if (!this.scaleX) return
+
     let {
       offsetX: x,
       offsetY: y,
     } = d3.event
+
     let gridBound = [[grid.left, grid.top], [cw - grid.right, ch - grid.bottom]]
     let bandWidth = scaleX.bandwidth()
 

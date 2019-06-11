@@ -1,5 +1,5 @@
 import {
-  isSet
+  isSet,
 } from 'mytoolkit'
 
 export default function drawLine(chart, layer, s, index) {
@@ -34,10 +34,8 @@ export default function drawLine(chart, layer, s, index) {
     })
     .defined((d) => !!d)
   let pd = line(s.data)
-  console.log(pd)
 
-
-  layer.append('path.lc-line')
+  layer.safeSelect('path.lc-line')
     .attr('d', pd)
     .attrs({ stroke: color, fill: 'none' })
 

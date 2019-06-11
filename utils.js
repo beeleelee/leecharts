@@ -70,4 +70,14 @@ export function d3Augment(d3) {
     append.lc_extended = true
     d3.selection.prototype.append = append
   }
+
+  if (!d3.selection.prototype.safeSelect) {
+    d3.selection.prototype.safeSelect = function (selector) {
+      let s = this.select(selector)
+      if (s.empty()) {
+        s = this.append(selector)
+      }
+      return s
+    }
+  }
 }
