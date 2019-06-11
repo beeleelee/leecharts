@@ -5,12 +5,16 @@ export default function axisX(chart) {
     containerHeight: ch,
     options: {
       grid,
-      xAxis
+      xAxis,
+      series,
     },
     sections: {
       axisX
     },
   } = chart
+  if (series.length === 0) return
+  // draw axis only when series contains line or bar
+  if (series.filter(s => s.type === 'line' || s.type === 'bar').length === 0) return
 
   let scaleX = d3.scaleBand()
     .domain(xAxis.data)

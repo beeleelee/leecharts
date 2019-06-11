@@ -148,28 +148,8 @@ class chart {
       .attr('y2', ch - grid.top)
 
   }
-  drawAxisX() {
-
-  }
   drawAxisY() {
-    let {
-      containerWidth: cw,
-      containerHeight: ch,
-      options: {
-        grid
-      },
-      sections: {
-        axisY
-      },
-    } = this
-    let scaleY = d3.scaleLinear()
-      .domain([0, 200000])
-      .range([ch - grid.bottom, grid.top])
-    this.scaleY = scaleY
-    axisY.attr('transform', `translate(${grid.left}, 0)`)
-      .call(d3.axisLeft(scaleY).ticks(5).tickSizeOuter(0).tickSizeInner(4).tickPadding(5).tickFormat(d => {
-        return d
-      }))
+
   }
   init() {
     if (!this.container) return
