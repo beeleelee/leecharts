@@ -12,6 +12,10 @@ import {
   isFunction,
 } from 'mytoolkit'
 
+import drawAxisX from './draw/axisX'
+import drawAxisY from './draw/axisY'
+import drawGridX from './draw/gridX'
+import drawGridY from './draw/gridY'
 import drawLine from './draw/line'
 import drawBar from './draw/bar'
 import drawLinePointer from './draw/linepointer'
@@ -28,7 +32,7 @@ class chart {
     this.emitter = new emitter()
     this.container = d3.select(selector)
     this.options = deepExtend(defaultOptions(), options)
-
+    this.previousOptions = null
     this.sections = {}
 
     this.init()
@@ -36,10 +40,10 @@ class chart {
 
   }
   drawChart() {
-    this.drawAxisX()
-    this.drawAxisY()
-    //this.drawGridX()
-    this.drawGridY()
+    drawAxisX(this)
+    drawAxisY(this)
+    drawGridX(this)
+    drawGridY(this)
     this.drawSeries()
   }
   drawSeries() {
@@ -69,7 +73,7 @@ class chart {
             drawLine(chart, layer, s, i)
             break
           case 'bar':
-            this.drawBar(chart, layer, s, i)
+            drawBar(chart, layer, s, i)
             break
           default:
         }
@@ -145,24 +149,7 @@ class chart {
 
   }
   drawAxisX() {
-    let {
-      containerWidth: cw,
-      containerHeight: ch,
-      options: {
-        grid,
-        xAxis
-      },
-      sections: {
-        axisX
-      },
-    } = this
-    let scaleX = d3.scaleBand()
-      .domain(xAxis.data)
-      .range([grid.left, cw - grid.right])
-    //console.log(scaleX.bandwidth(), (cw - grid.right - grid.left) / 6)
-    this.scaleX = scaleX
-    axisX.attr('transform', `translate(0, ${ch - grid.bottom})`)
-      .call(d3.axisBottom(scaleX).tickSizeOuter(0))
+
   }
   drawAxisY() {
     let {

@@ -13,9 +13,11 @@ export default function options() {
       text: ''
     },
     yAxis: {
-      title: {
-        text: ''
-      }
+      type: 'value'
+    },
+    xAxis: {
+      type: 'category',
+      data: []
     },
     legend: {
       layout: 'horizontal',
