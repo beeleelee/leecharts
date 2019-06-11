@@ -19,6 +19,7 @@ import drawGridX from './draw/gridX'
 import drawGridY from './draw/gridY'
 import drawLine from './draw/line'
 import drawBar from './draw/bar'
+import drawPie from './draw/pie'
 import drawLinePointer from './draw/linepointer'
 import emitter from './emitter'
 
@@ -78,6 +79,8 @@ class chart {
           case 'bar':
             drawBar(chart, layer, s, i)
             break
+          case 'pie':
+            drawPie(chart, layer, s, i)
           default:
         }
 
