@@ -3,7 +3,7 @@ import {
 } from 'mytoolkit'
 
 export function parsePercent(p) {
-  if (!/^\d+(\.\d+)?%$/.test(p)) return 0.5
+  if (!/^\d+(\.\d+)?%$/.test(p)) return p
 
   return parseFloat(p) / 100
 }

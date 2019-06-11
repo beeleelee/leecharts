@@ -28,7 +28,7 @@ export default function options() {
   }
 }
 
-options.seriesColor = [
+let colors = [
   '#7cb5ec',
   '#434348',
   '#90ed7d',
@@ -38,3 +38,10 @@ options.seriesColor = [
   '#e4d354',
   '#2b908f'
 ]
+
+options.seriesColor = colors
+
+
+options.getColor = i => {
+  return colors[i % colors.length]
+}

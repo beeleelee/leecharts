@@ -167,7 +167,6 @@ class chart {
     let ch = this.containerHeight = height
     this.containerCenter = [cw / 2, ch / 2]
     this.paper.attrs({ width: cw, height: ch })
-    console.log(cw, ch)
   }
   init() {
     if (!this.container) return
