@@ -2,6 +2,12 @@ import {
   isObject,
 } from 'mytoolkit'
 
+export function parsePercent(p) {
+  if (!/^\d+(\.\d+)?%$/.test(p)) return 0.5
+
+  return parseFloat(p) / 100
+}
+
 export function isInBound(bound, x, y) {
   let bl = bound[0], br = bound[1]
   if (bl[0] - x > 0) return false
