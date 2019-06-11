@@ -1,3 +1,7 @@
+import {
+  easeBounce
+} from 'd3-ease'
+
 export default function options() {
   return {
     grid: {
@@ -45,3 +49,7 @@ options.seriesColor = colors
 options.getColor = i => {
   return colors[i % colors.length]
 }
+
+options.focusAniDuration = 300
+options.focusRate = 1.1
+options.focusPieEase = easeBounce

@@ -13,6 +13,7 @@ export default function drawPie(chart, layer, s, index) {
     containerWidth: cw,
     containerHeight: ch,
     containerCenter: cc,
+    highlightIndex,
   } = chart
   let data = s.data
   if (!data || !data.length) return
@@ -26,13 +27,49 @@ export default function drawPie(chart, layer, s, index) {
   let d3arc = d3.arc()
     .outerRadius(outerRadius)
     .innerRadius(innerRadius)
-  console.log(innerRadius, outerRadius, arcs)
+
+
   layer.attr('transform', `translate(${pieCenter[0]}, ${pieCenter[1]})`)
   layer.selectAll('path.lc-arc')
     .data(arcs)
     .join('path.lc-arc')
     .attr('d', d3arc)
     .attr('fill', (d, i) => {
+      return defaultOptions.getColor(i)
+    })
+    .on('click', function (d, i) {
+      if (i === highlightIndex) return
 
+
+      emitter.emit('highlightChange', i)
+    })
+    .on('mouseover', function (d, i) {
+      console.log(d, i)
+      let ele = d3.select(this)
+      let startOuter = outerRadius
+      let endOuter = outerRadius * defaultOptions.focusRate
+      ele.transition()
+        .duration(defaultOptions.focusAniDuration)
+        .ease(defaultOptions.focusPieEase)
+        .attrTween('d', () => {
+          let inter = d3.interpolate(startOuter, endOuter)
+          return t => {
+            return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
+          }
+        })
+    })
+    .on('mouseout', function (d, i) {
+      let ele = d3.select(this)
+      let startOuter = outerRadius * defaultOptions.focusRate
+      let endOuter = outerRadius
+      ele.transition()
+        .duration(defaultOptions.focusAniDuration)
+        .ease(defaultOptions.focusPieEase)
+        .attrTween('d', () => {
+          let inter = d3.interpolate(startOuter, endOuter)
+          return t => {
+            return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
+          }
+        })
     })
 }
