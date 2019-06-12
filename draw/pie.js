@@ -59,6 +59,7 @@ export default function drawPie(chart, layer, s, index) {
           .style('opacity', 1)
 
       } else {
+        console.log(otherPieItems)
         otherPieItems.transition()
           .duration(defaultOptions.focusAniDuration)
           .style('opacity', 0.4)
@@ -102,6 +103,8 @@ export default function drawPie(chart, layer, s, index) {
         })
 
     })
+
+  pieItems
     .transition()
     .duration(defaultOptions.enterAniDuration)
     .ease(defaultOptions.enterAniEase)
