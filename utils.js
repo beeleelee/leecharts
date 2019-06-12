@@ -2,6 +2,11 @@ import {
   isObject,
 } from 'mytoolkit'
 
+export function getData(arr, index) {
+  let item = arr[index]
+  return item && item.value ? item.value : item
+}
+
 export function parsePercent(p) {
   if (!/^\d+(\.\d+)?%$/.test(p)) return p
 
