@@ -149,16 +149,14 @@ class chart {
     this.sections.desc = this.paper.append('desc')
     this.sections.defs = this.paper.append('defs')
 
-    this.sections.gridX = this.paper.append('g.lc-grid-x')
-
-    this.sections.gridY = this.paper.append('g.lc-grid-y')
-
     this.sections.axisX = this.paper.append('g.lc-axis-x')
     this.sections.axisY = this.paper.append('g.lc-axis-y')
-    this.sections.linePointer = this.paper.append('line.lc-line-pointer')
+    // this.sections.linePointer = this.paper.append('line.lc-line-pointer')
     this.sections.shadowPointer = this.paper.append('rect.lc-shadow-pointer')
 
     this.sections.series = this.paper.append('g.lc-series')
+    this.sections.linePointer = this.paper.append('line.lc-line-pointer')
+    this.sections.plotGroup = this.paper.append('g.lc-plot-group')
 
     this.sections.labels = this.paper.append('g.lc-labels')
     this.sections.title = this.paper.append('text.lc-title')

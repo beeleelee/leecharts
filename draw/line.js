@@ -17,6 +17,7 @@ export default function drawLine(chart, layer, s, index) {
     },
     sections: {
       series,
+      plotGroup,
     },
     scaleY,
     scaleX,
@@ -43,20 +44,36 @@ export default function drawLine(chart, layer, s, index) {
   let line = d3.line()
     .x((d, i) => position(d, i, true))
     .y((d, i) => position(d, i, false))
+    .curve(d3.curveCardinal)
     .defined((d) => !!d)
   let sData = s.data || []
   sData.map(item => item && item.value ? item.value : item)
 
-  let pd = line(sData)
+  let area = d3.area()
+    .x((d, i) => position(d, i, true))
+    .y((d, i) => position(d, i, false))
+    .curve(d3.curveCardinal)
+    .defined((d) => !!d)
+  if (orient === 'h') {
+    area.y1(ch - grid.bottom)
+  } else {
+    area.x1(grid.left)
+  }
+
+  layer.safeSelect('path.lc-area')
+    .attr('d', area(sData))
+    .attrs({ stroke: 'none', fill: color })
 
   layer.safeSelect('path.lc-line')
-    .attr('d', pd)
+    .attr('d', line(sData))
     .attrs({ stroke: color, fill: 'none' })
 
+
+  let currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
   let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
   let r = plotSetting.size / 2
 
-  layer.selectAll('circle.lc-node')
+  currentPlotGroup.selectAll('circle.lc-node')
     .data(s.data)
     .join('circle.lc-node')
     .attrs({
@@ -69,10 +86,10 @@ export default function drawLine(chart, layer, s, index) {
       stroke: color
     })
   emitter.on('axisChange', (i) => {
-    let n = layer.selectAll(`.lc-active-node`)
+    let n = currentPlotGroup.selectAll(`.lc-active-node`)
     !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
     if (i !== null) {
-      layer.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
+      currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
         .classed('lc-active-node', true)
         .transition().duration(defaultOptions.focusAniDuration)
         .attr('r', r * 1.5)

@@ -16,7 +16,7 @@ export default function axisX(chart) {
       xAxis
     },
     sections: {
-      axisX
+      axisX,
     },
     maxValue,
     maxValueFixed,
