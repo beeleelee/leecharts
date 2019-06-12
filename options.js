@@ -81,6 +81,7 @@ options.axisLabel = {
 options.strokeDasharray = "6 3"
 
 options.plot = {
+  show: true,
   type: 'circle',
   size: 10
 }
