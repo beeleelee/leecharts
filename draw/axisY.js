@@ -48,7 +48,7 @@ export default function axisY(chart) {
       .range([ch - grid.bottom, grid.top])
 
     tickValues = d3.ticks(0, max, tickNumber)
-    console.log(tickValues)
+
     chart.yAxisTickValues = tickValues
   }
 
@@ -66,7 +66,7 @@ export default function axisY(chart) {
       y2: scaleY.range()[0],
     })
   // axis ticks 
-  let ticks = axisY.selectAll('line.lc-axis-tick')
+  axisY.selectAll('line.lc-axis-tick')
     .data(tickValues)
     .join('line.lc-axis-tick')
     .attrs({
@@ -79,24 +79,28 @@ export default function axisY(chart) {
   let axisLabelSetting = extend({}, defaultOptions.axisLabel, yAxis.axisLabel || {})
   // axis label
   let labelPadding = axisLabelSetting.padding + (yAxis.tickInside ? 0 : tickSize)
-  axisY.selectAll('text.lc-axis-label')
+
+  let labelgroup = axisY.selectAll('g.lc-axis-lable-g')
     .data(tickValues)
-    .join('text.lc-axis-label')
-    .text(d => {
-      if (isFunction(axisLabelSetting.formatter)) {
-        return axisLabelSetting.formatter(d)
-      }
-      return addComma(d)
-    })
-    .attrs({
-      'text-anchor': 'end',
-      x: -labelPadding,
-      y: d => scaleY(d) + axisLabelSetting.fontSize / 3,
-      stroke: 'none',
-      fill: axisLabelSetting.color,
-      transform: `rotate(${axisLabelSetting.rotate})`
-    })
-    .styles({
-      'font-size': axisLabelSetting.fontSize
-    })
+    .join('g.lc-axis-label-g')
+    .attr('transform', d => `translate(${-labelPadding}, ${scaleY(d) + axisLabelSetting.fontSize / 3})`)
+  labelgroup.each(function (d, i) {
+    d3.select(this)
+      .safeSelect('text')
+      .text(d => {
+        if (isFunction(axisLabelSetting.formatter)) {
+          return axisLabelSetting.formatter(d)
+        }
+        return addComma(d)
+      })
+      .attrs({
+        'text-anchor': 'end',
+        stroke: 'none',
+        fill: axisLabelSetting.color,
+        transform: `rotate(${axisLabelSetting.rotate})`
+      })
+      .styles({
+        'font-size': axisLabelSetting.fontSize
+      })
+  })
 }
