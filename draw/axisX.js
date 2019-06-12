@@ -108,20 +108,20 @@ export default function axisX(chart) {
   })
 
   // split lines 
-  // let sls = xAxis.splitLine
-  // if (!sls.show) return
+  let sls = xAxis.splitLine
+  if (!sls.show) return
 
 
-  // let splitLines = axisX.safeSelect('g.lc-split-lines')
-  // splitLines.selectAll('line')
-  //   .data(tickValues.filter(v => v !== 0))
-  //   .join('line')
-  //   .attrs({
-  //     fill: 'none',
-  //     stroke: sls.color,
-  //     'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
-  //     y1: d => scaleX(d),
-  //     x2: cw - grid.right - grid.left,
-  //     y2: d => scaleX(d)
-  //   })
+  let splitLines = axisX.safeSelect('g.lc-split-lines')
+  splitLines.selectAll('line')
+    .data(tickValues.filter(v => v !== 0))
+    .join('line')
+    .attrs({
+      fill: 'none',
+      stroke: sls.color,
+      'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
+      x1: d => scaleX(d),
+      y2: -(ch - grid.bottom - grid.top),
+      x2: d => scaleX(d)
+    })
 }
