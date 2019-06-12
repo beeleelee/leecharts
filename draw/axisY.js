@@ -49,7 +49,14 @@ export default function axisY(chart) {
 
   chart.scaleY = scaleY
   axisY.attr('transform', `translate(${grid.left}, 0)`)
-    .call(d3.axisLeft(scaleY).ticks(9).tickSizeOuter(0).tickSizeInner(4).tickPadding(5).tickFormat(d => {
-      return d
-    }))
+
+  let lineColor = yAxis.lineColor || defaultOptions.axisLineColor, tickSize
+  // axis bar 
+  axisY.safeSelect('line.domain')
+    .attrs({
+      fill: 'none',
+      stroke: lineColor,
+      y1: scaleY.range()[1],
+      y2: scaleY.range()[0],
+    })
 }

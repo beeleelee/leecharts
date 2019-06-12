@@ -60,3 +60,4 @@ options.enterAniDuration = 1000
 options.enterAniEase = easeSinInOut
 
 options.tickNumber = 5
+options.axisLineColor = '#ddd'
