@@ -31,11 +31,13 @@ export default function axisY(chart) {
     axisY.html('')
     return
   }
-  let scaleY, domainData, max, tickNumber, tickIncrement, tickValues
+  let scaleY, domainData, max, tickNumber, tickIncrement, tickValues, category
 
   if (yAxis.type === 'category' && yAxis.data && yAxis.data.length) {
     domainData = yAxis.data.map(item => item && item.value ? item.value : item)
     scaleY = d3.scaleBand().domain(domainData).range([ch - grid.bottom, grid.top])
+    tickValues = domainData
+    category = true
   } else {
     max = maxValue
     tickNumber = yAxis.tickNumber || defaultOptions.tickNumber
@@ -48,10 +50,10 @@ export default function axisY(chart) {
       .range([ch - grid.bottom, grid.top])
 
     tickValues = d3.ticks(0, max, tickNumber)
-
-    chart.yAxisTickValues = tickValues
+    category = false
   }
 
+  chart.yAxisTickValues = tickValues
   chart.scaleY = scaleY
   axisY.attr('transform', `translate(${grid.left}, 0)`)
 
@@ -83,7 +85,7 @@ export default function axisY(chart) {
   let labelgroup = axisY.selectAll('g.lc-axis-lable-g')
     .data(tickValues)
     .join('g.lc-axis-label-g')
-    .attr('transform', d => `translate(${-labelPadding}, ${scaleY(d) + axisLabelSetting.fontSize / 3})`)
+    .attr('transform', d => `translate(${-labelPadding}, ${(category ? scaleY.bandwidth() * 0.5 : 0) + scaleY(d) + axisLabelSetting.fontSize / 3})`)
   labelgroup.each(function (d, i) {
     d3.select(this)
       .safeSelect('text')

@@ -1,5 +1,6 @@
 import {
   isSet,
+  extend,
 } from 'mytoolkit'
 
 export default function drawLine(chart, layer, s, index) {
@@ -12,6 +13,7 @@ export default function drawLine(chart, layer, s, index) {
     options: {
       grid,
       xAxis,
+      yAxis,
     },
     sections: {
       series,
@@ -19,45 +21,87 @@ export default function drawLine(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-  let color = s.color || defaultOptions.seriesColor[index] || '#00ff00'
+  let color = s.color || defaultOptions.getColor(index)
 
-  let bandWidth = scaleX.bandwidth()
+  let scaleCategory, scaleValue, orient
+
+  if (scaleX.bandwidth) {
+    scaleCategory = scaleX
+    scaleValue = scaleY
+    orient = 'h'
+  } else if (scaleY.bandwidth) {
+    scaleCategory = scaleY
+    scaleValue = scaleX
+    orient = 'v'
+  } else {
+    scaleCategory = scaleX
+    scaleValue = scaleY
+    orient = 'h'
+  }
+  let bandWidth = scaleCategory && scaleCategory.bandwidth ? scaleCategory.bandwidth() : 0
 
   let line = d3.line()
-    .x((d, i) => {
-
-      return scaleX(xAxis.data[i]) + bandWidth / 2
-    })
-    .y((d, i) => {
-
-      return scaleY(d)
-    })
+    .x((d, i) => position(d, i, true))
+    .y((d, i) => position(d, i, false))
     .defined((d) => !!d)
-  let pd = line(s.data)
+  let sData = s.data || []
+  sData.map(item => item && item.value ? item.value : item)
+
+  let pd = line(sData)
 
   layer.safeSelect('path.lc-line')
     .attr('d', pd)
     .attrs({ stroke: color, fill: 'none' })
 
-  let gnode = layer.selectAll('circle.lc-node')
+  let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
+  let r = plotSetting.size / 2
+
+  layer.selectAll('circle.lc-node')
     .data(s.data)
     .join('circle.lc-node')
     .attrs({
-      cx: (d, i) => scaleX(xAxis.data[i]) + bandWidth / 2,
-      cy: d => scaleY(d),
-      r: d => d ? 5 : 0,
+      //cx: (d, i) => scaleCategory(xAxis.data[i]) + bandWidth / 2,
+      //cy: d => scaleValue(d),
+      cx: (d, i) => position(d, i, true),
+      cy: (d, i) => position(d, i, false),
+      r: d => d ? r : 0,
       fill: '#ffffff',
       stroke: color
     })
   emitter.on('axisChange', (i) => {
     let n = layer.selectAll(`.lc-active-node`)
-    !n.empty() && n.classed('lc-active-node', false).transition().duration(300).attr('r', 5)
+    !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
     if (i !== null) {
       layer.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
         .classed('lc-active-node', true)
-        .transition().duration(300)
-        .attr('r', 10)
+        .transition().duration(defaultOptions.focusAniDuration)
+        .attr('r', r * 1.5)
     }
   })
+  function position(d, i, isX) {
+    let td, scale, bw
 
+    if (isX) {
+      if (orient === 'h') {
+        scale = scaleCategory
+        td = xAxis.data[i]
+        bw = bandWidth
+      } else {
+        scale = scaleValue
+        td = d
+        bw = 0
+      }
+    } else {
+      if (orient === 'v') {
+        scale = scaleCategory
+        td = yAxis.data[i]
+        bw = bandWidth
+      } else {
+        scale = scaleValue
+        td = d
+        bw = 0
+      }
+    }
+    return scale(td) + bw / 2
+  }
 }

@@ -15,8 +15,6 @@ import {
 
 import drawAxisX from './draw/axisX'
 import drawAxisY from './draw/axisY'
-import drawGridX from './draw/gridX'
-import drawGridY from './draw/gridY'
 import drawLine from './draw/line'
 import drawBar from './draw/bar'
 import drawPie from './draw/pie'
@@ -144,6 +142,7 @@ class chart {
 
     this.paper
       .on('mousemove', function () {
+
         chart.__onMousemove()
       })
 
@@ -180,9 +179,19 @@ class chart {
       },
       emitter,
       scaleX,
+      scaleY,
       activeCategroryIndex,
     } = this
-    if (!this.scaleX) return
+    let scaleCategory, orient
+
+    if (scaleX.bandwidth) {
+      scaleCategory = scaleX
+      orient = 'h'
+    } else if (scaleY.bandwidth) {
+      scaleCategory = scaleY
+      orient = 'v'
+    }
+    if (!scaleCategory) return
 
     let {
       offsetX: x,
@@ -190,11 +199,19 @@ class chart {
     } = d3.event
 
     let gridBound = [[grid.left, grid.top], [cw - grid.right, ch - grid.bottom]]
-    let bandWidth = scaleX.bandwidth()
+    let bandWidth = scaleCategory.bandwidth()
 
     if (isInBound(gridBound, x, y)) {
-      let i = Math.ceil((x - grid.left) / bandWidth) - 1
+      let i, l, scaleRange
+      scaleRange = scaleCategory.range()
+      l = Math.round(Math.abs(scaleRange[0] - scaleRange[1]) / bandWidth)
+      if (orient === 'h') {
+        i = Math.ceil((x - grid.left) / bandWidth) - 1
+      } else {
+        i = Math.ceil((y - grid.bottom) / bandWidth) - 1
+      }
       i = Math.max(0, i)
+      i = orient === 'v' ? l - i - 1 : i
       if (i !== activeCategroryIndex) {
         this.activeCategroryIndex = i
         emitter.emit('axisChange', i)

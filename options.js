@@ -79,3 +79,8 @@ options.axisLabel = {
   rotate: 0
 }
 options.strokeDasharray = "6 3"
+
+options.plot = {
+  type: 'circle',
+  size: 10
+}
