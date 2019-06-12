@@ -50,7 +50,8 @@ export default function axisY(chart) {
   chart.scaleY = scaleY
   axisY.attr('transform', `translate(${grid.left}, 0)`)
 
-  let lineColor = yAxis.lineColor || defaultOptions.axisLineColor, tickSize
+  let lineColor = yAxis.lineColor || defaultOptions.axisLineColor, tickSize = yAxis.tickSize || defaultOptions.axisTickSize
+
   // axis bar 
   axisY.safeSelect('line.domain')
     .attrs({
@@ -58,5 +59,15 @@ export default function axisY(chart) {
       stroke: lineColor,
       y1: scaleY.range()[1],
       y2: scaleY.range()[0],
+    })
+  let ticks = axisY.selectAll('line.lc-axis-tick')
+    .data(tickValues)
+    .join('line.lc-axis-tick')
+    .attrs({
+      fill: 'none',
+      stroke: lineColor,
+      x1: yAxis.tickInside ? tickSize : -tickSize,
+      y1: d => scaleY(d),
+      y2: d => scaleY(d)
     })
 }

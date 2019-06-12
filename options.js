@@ -61,3 +61,4 @@ options.enterAniEase = easeSinInOut
 
 options.tickNumber = 5
 options.axisLineColor = '#ddd'
+options.axisTickSize = 6
