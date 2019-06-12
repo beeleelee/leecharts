@@ -191,7 +191,7 @@ class chart {
     let maxValue = 0
     sArray.forEach(s => {
       let d = s.data || []
-      d = d.map(item => item.value ? item.value : item)
+      d = d.map(item => item && item.value ? item.value : item)
       let max = Math.max.apply(this, d)
       maxValue = Math.max(maxValue, max)
     })
