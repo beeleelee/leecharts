@@ -18,10 +18,12 @@ export default function options() {
       text: ''
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
+      show: true,
     },
     xAxis: {
       type: 'category',
+      show: true,
       data: []
     },
     legend: {
