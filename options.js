@@ -62,3 +62,9 @@ options.enterAniEase = easeSinInOut
 options.tickNumber = 5
 options.axisLineColor = '#ddd'
 options.axisTickSize = 6
+options.axisLabel = {
+  fontSize: 12,
+  color: '#aaa',
+  padding: 10,
+  rotate: 0
+}

@@ -1,3 +1,8 @@
+import {
+  isFunction,
+  extend,
+  addComma,
+} from 'mytoolkit'
 
 export default function axisY(chart) {
   let {
@@ -60,6 +65,7 @@ export default function axisY(chart) {
       y1: scaleY.range()[1],
       y2: scaleY.range()[0],
     })
+  // axis ticks 
   let ticks = axisY.selectAll('line.lc-axis-tick')
     .data(tickValues)
     .join('line.lc-axis-tick')
@@ -69,5 +75,28 @@ export default function axisY(chart) {
       x1: yAxis.tickInside ? tickSize : -tickSize,
       y1: d => scaleY(d),
       y2: d => scaleY(d)
+    })
+  let axisLabelSetting = extend({}, defaultOptions.axisLabel, yAxis.axisLabel || {})
+  // axis label
+  let labelPadding = axisLabelSetting.padding + (yAxis.tickInside ? 0 : tickSize)
+  axisY.selectAll('text.lc-axis-label')
+    .data(tickValues)
+    .join('text.lc-axis-label')
+    .text(d => {
+      if (isFunction(axisLabelSetting.formatter)) {
+        return axisLabelSetting.formatter(d)
+      }
+      return addComma(d)
+    })
+    .attrs({
+      'text-anchor': 'end',
+      x: -labelPadding,
+      y: d => scaleY(d) + axisLabelSetting.fontSize / 3,
+      stroke: 'none',
+      fill: axisLabelSetting.color,
+      transform: `rotate(${axisLabelSetting.rotate})`
+    })
+    .styles({
+      'font-size': axisLabelSetting.fontSize
     })
 }
