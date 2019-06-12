@@ -47,8 +47,6 @@ class chart {
   drawChart() {
     drawAxisX(this)
     drawAxisY(this)
-    drawGridX(this)
-    drawGridY(this)
     this.drawSeries()
   }
   drawSeries() {
@@ -86,73 +84,6 @@ class chart {
         }
 
       })
-
-  }
-  drawGridY() {
-    let {
-      containerWidth: cw,
-      containerHeight: ch,
-      options: {
-        grid
-      },
-      sections: {
-        gridY,
-        axisY,
-      },
-      scaleY,
-    } = this
-    let tickValues = []
-    axisY.selectAll('g.tick')
-      .selectAll('text')
-      .each(function () {
-        let v = d3.select(this).text()
-      })
-
-    // gridX.selectAll('line')
-    //   .data(['name1', 'name2', 'name3', 'name4', 'name5', 'name6'])
-    //   .join('line')
-    //   .attrs({
-    //     fill: 'none',
-    //     stroke: '#ddd',
-    //     'stroke-dasharray': [4, 4],
-    //     y1: grid.top
-    //   })
-    //   .attr('x1', d => {
-    //     return scaleX(d) + bandWidth / 2
-    //   })
-    //   .attr('x2', d => scaleX(d) + bandWidth / 2)
-    //   .attr('y2', ch - grid.top)
-
-  }
-  drawGridX() {
-    let {
-      containerWidth: cw,
-      containerHeight: ch,
-      options: {
-        grid,
-      },
-      sections: {
-        gridX
-      },
-    } = this
-    let scaleX = d3.scaleBand()
-      .domain(['name1', 'name2', 'name3', 'name4', 'name5', 'name6'])
-      .range([grid.left, cw - grid.right])
-    let bandWidth = scaleX.bandwidth()
-    gridX.selectAll('line')
-      .data(['name1', 'name2', 'name3', 'name4', 'name5', 'name6'])
-      .join('line')
-      .attrs({
-        fill: 'none',
-        stroke: '#ddd',
-        'stroke-dasharray': [4, 4],
-        y1: grid.top
-      })
-      .attr('x1', d => {
-        return scaleX(d) + bandWidth / 2
-      })
-      .attr('x2', d => scaleX(d) + bandWidth / 2)
-      .attr('y2', ch - grid.top)
 
   }
   resize() {

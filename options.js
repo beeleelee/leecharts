@@ -20,11 +20,21 @@ export default function options() {
     yAxis: {
       type: 'value',
       show: true,
+      splitLine: {
+        show: true,
+        color: '#ddd',
+        type: 'dashed'
+      }
     },
     xAxis: {
       type: 'category',
       show: true,
-      data: []
+      data: [],
+      splitLine: {
+        show: false,
+        color: '#ddd',
+        type: 'solid'
+      }
     },
     legend: {
       layout: 'horizontal',
@@ -68,3 +78,4 @@ options.axisLabel = {
   padding: 10,
   rotate: 0
 }
+options.strokeDasharray = "6 3"

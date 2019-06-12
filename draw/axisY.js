@@ -103,4 +103,22 @@ export default function axisY(chart) {
         'font-size': axisLabelSetting.fontSize
       })
   })
+
+  // split lines 
+  let sls = yAxis.splitLine
+  if (!sls.show) return
+
+
+  let splitLines = axisY.safeSelect('g.lc-split-lines')
+  splitLines.selectAll('line')
+    .data(tickValues.filter(v => v !== 0))
+    .join('line')
+    .attrs({
+      fill: 'none',
+      stroke: sls.color,
+      'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
+      y1: d => scaleY(d),
+      x2: cw - grid.right - grid.left,
+      y2: d => scaleY(d)
+    })
 }

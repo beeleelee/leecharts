@@ -1,6 +1,8 @@
+
 export default function drawLinePointer(chart, index) {
   let {
     d3,
+    defaultOptions,
     scaleX,
     containerHeight: ch,
     options: {
@@ -26,7 +28,7 @@ export default function drawLinePointer(chart, index) {
         x2: x,
         y2: ch - grid.top,
         stroke: '#ddd',
-        'stroke-dasharray': "4 4",
+        'stroke-dasharray': defaultOptions.strokeDasharray,
         opacity: 1
       })
   }
