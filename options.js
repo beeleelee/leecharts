@@ -58,3 +58,5 @@ options.focusRate = 1.1
 options.focusPieEase = easeBounce
 options.enterAniDuration = 1000
 options.enterAniEase = easeSinInOut
+
+options.tickNumber = 5

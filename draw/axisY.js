@@ -2,6 +2,7 @@
 export default function axisY(chart) {
   let {
     d3,
+    defaultOptions,
     containerWidth: cw,
     containerHeight: ch,
     options: {
@@ -12,6 +13,8 @@ export default function axisY(chart) {
     sections: {
       axisY
     },
+    maxValue,
+    maxValueFixed,
   } = chart
   let showAxis = true
   if (!yAxis.show) showAxis = false
@@ -29,9 +32,7 @@ export default function axisY(chart) {
     domainData = yAxis.data.map(item => item.value ? item.value : item)
     scaleY = d3.scaleBand().domain(domainData).range([ch - grid.bottom, grid.top])
   } else {
-    matchSeries = series.find(s => s.type === 'line' || s.type === 'bar')
-    matchData = matchSeries.data || []
-    matchData = matchData.map(item => item.value ? item.value : item)
+    let max = maxValue
 
   }
   scaleY = d3.scaleLinear()

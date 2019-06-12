@@ -36,6 +36,7 @@ class chart {
     this.options = deepExtend(defaultOptions(), options)
     this.previousOptions = null
     this.sections = {}
+    this.maxValue = 0
 
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)
@@ -168,6 +169,35 @@ class chart {
     this.containerCenter = [cw / 2, ch / 2]
     this.paper.attrs({ width: cw, height: ch })
   }
+  calculateMaxValue() {
+    let {
+      options: {
+        xAxis,
+        yAxis,
+        series,
+      }
+    } = this
+    if (xAxis.type === 'value' && xAxis.max) {
+      this.maxValue = xAxis.max
+      this.maxValueFixed = true
+      return
+    }
+    if (yAxis.type === 'value' && yAxis.max) {
+      this.maxValue = yAxis.max
+      this.maxValueFixed = true
+      return
+    }
+    let sArray = series.filter(s => s.type === 'bar' || s.type === 'line')
+    let maxValue = 0
+    sArray.forEach(s => {
+      let d = s.data || []
+      d = d.map(item => item.value ? item.value : item)
+      let max = Math.max.apply(this, d)
+      maxValue = Math.max(maxValue, max)
+    })
+    this.maxValue = maxValue
+    this.maxValueFixed = false
+  }
   init() {
     if (!this.container) return
     if (this.container.empty && this.container.empty()) return
@@ -179,6 +209,7 @@ class chart {
     this.paper = this.container.append('svg.lc-root')
 
     this.figureGeometry()
+    this.calculateMaxValue()
 
     this.paper
       .on('mousemove', function () {
