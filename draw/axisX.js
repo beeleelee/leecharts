@@ -83,7 +83,7 @@ export default function axisX(chart) {
   // axis label
   let labelPadding = axisLabelSetting.padding + (xAxis.tickInside ? 0 : tickSize)
 
-  let labelgroup = axisX.selectAll('g.lc-axis-lable-g')
+  let labelgroup = axisX.selectAll('g.lc-axis-label-g')
     .data(tickValues)
     .join('g.lc-axis-label-g')
     .attr('transform', d => `translate(${scaleX(d) + (category ? scaleX.bandwidth() * 0.5 : 0)}, ${labelPadding + axisLabelSetting.fontSize * 0.5})`)

@@ -82,10 +82,11 @@ export default function axisY(chart) {
   // axis label
   let labelPadding = axisLabelSetting.padding + (yAxis.tickInside ? 0 : tickSize)
 
-  let labelgroup = axisY.selectAll('g.lc-axis-lable-g')
+  let labelgroup = axisY.selectAll('g.lc-axis-label-g')
     .data(tickValues)
     .join('g.lc-axis-label-g')
     .attr('transform', d => `translate(${-labelPadding}, ${(category ? scaleY.bandwidth() * 0.5 : 0) + scaleY(d) + axisLabelSetting.fontSize / 3})`)
+
   labelgroup.each(function (d, i) {
     d3.select(this)
       .safeSelect('text')

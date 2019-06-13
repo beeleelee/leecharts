@@ -45,8 +45,22 @@ export default function drawGradient(chart, color, defaultColor) {
         colorString
       })
       return `url(#${id})`
-    } else if (color.typ === 'radial') {
-
+    } else if (color.type === 'radial') {
+      color.colorStops.forEach(item => {
+        r += `<stop offset="${toFixed(item.offset, 0, 100)}%" stop-color="${item.color}"/>`
+      })
+      defs.append('radialGradient')
+        .attrs({
+          id,
+          cx: color.x,
+          cy: color.y,
+          r: color.r
+        }).html(r)
+      gradientPool.push({
+        id,
+        colorString
+      })
+      return `url(#${id})`
     }
     return r
   }
