@@ -3,6 +3,7 @@ import {
   extend,
   randStr,
 } from 'mytoolkit'
+import drawGradient from './gradient'
 
 export default function drawLine(chart, layer, s, index) {
   let {
@@ -76,7 +77,9 @@ export default function drawLine(chart, layer, s, index) {
         }
       })
     }
-    let areaColor = s.areaStyle && s.areaStyle.color || defaultOptions.getAreaColor(index)
+    let areaColor = s.areaStyle ? s.areaStyle.color : null
+    areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
+    console.log('area color', areaColor)
     layer.safeSelect('path.lc-area')
       .attr('d', area(sData))
       .attrs({ stroke: 'none', fill: areaColor })
