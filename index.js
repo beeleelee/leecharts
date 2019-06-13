@@ -6,12 +6,12 @@ import {
   d3Augment,
   deepExtend,
   isInBound,
+  getData,
 } from './utils'
 import {
-  isArray,
-  isFunction,
-  randStr,
+  isSet,
   debounce,
+  groupBy,
 } from 'mytoolkit'
 
 import drawAxisX from './draw/axisX'
@@ -101,6 +101,43 @@ class chart {
     this.containerCenter = [cw / 2, ch / 2]
     this.paper.attrs({ width: cw, height: ch })
   }
+  calculateStackData() {
+    let {
+      options: {
+        series = []
+      }
+    } = this
+
+    let lineCharts = series.filter(s => s.type === 'line')
+    let barCharts = series.filter(s => s.type === 'bar')
+
+    let lineHasStack = lineCharts.filter(s => !!s.stack)
+    let barHasStack = barCharts.filter(s => !!s.stack)
+
+    // line has stack 
+    if (lineHasStack.length) {
+      let lineStackGroups = groupBy(lineHasStack, 'stack')
+      Object.keys(lineStackGroups)
+        .forEach(k => {
+          let group = lineStackGroups[k]
+          let stackedData = []
+          group.forEach((item, idx) => {
+            if (stackedData.length === 0) {
+              stackedData = Array.from({ length: item.data.length }).map(() => 0)
+            }
+            let itemStackData = Array.from({ length: item.data.length }).map(() => [])
+            item.data.forEach((d, i) => {
+              d = isSet(d) ? (d.value ? d.value : d) : 0
+              let isd = itemStackData[i]
+              isd[0] = stackedData[i]
+              isd[1] = stackedData[i] + d
+            })
+            item.stackData = itemStackData
+            stackedData = itemStackData.map(item => item[1])
+          })
+        })
+    }
+  }
   calculateMaxValue() {
     let {
       options: {
@@ -123,6 +160,9 @@ class chart {
     let maxValue = 0
     sArray.forEach(s => {
       let d = s.data || []
+      if (s.stackData) {
+        d = s.stackData.map(item => item[1])
+      }
       d = d.map(item => item && item.value ? item.value : item)
       let max = Math.max.apply(this, d)
       maxValue = Math.max(maxValue, max)
@@ -141,6 +181,7 @@ class chart {
     this.paper = this.container.append('svg.lc-root')
 
     this.figureGeometry()
+    this.calculateStackData()
     this.calculateMaxValue()
 
     this.paper
