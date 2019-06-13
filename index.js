@@ -224,6 +224,8 @@ class chart {
       scaleY,
       activeCategroryIndex,
     } = this
+    if (!scaleX || !scaleY) return
+
     let scaleCategory, orient
 
     if (scaleX.bandwidth) {

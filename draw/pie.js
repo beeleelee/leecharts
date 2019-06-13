@@ -18,6 +18,8 @@ export default function drawPie(chart, layer, s, index) {
   let data = s.data
   if (!data || !data.length) return
 
+  let focusAnimation = isSet(s.focusAnimation) ? s.focusAnimation : true
+
   let pieCenter = s.center || [0.5, 0.5]
   pieCenter = [cw * parsePercent(pieCenter[0]), ch * parsePercent(pieCenter[1])]
   let radius = s.radius || [0, 0.7]
@@ -33,7 +35,6 @@ export default function drawPie(chart, layer, s, index) {
   let pieItems = layer.selectAll('path.lc-arc')
     .data(arcs)
     .join('path.lc-arc')
-    //.attr('d', d3arc)
     .attr('item-index', (d, i) => i)
     .attr('fill', (d, i) => {
       return defaultOptions.getColor(i)
@@ -59,7 +60,6 @@ export default function drawPie(chart, layer, s, index) {
           .style('opacity', 1)
 
       } else {
-        console.log(otherPieItems)
         otherPieItems.transition()
           .duration(defaultOptions.focusAniDuration)
           .style('opacity', 0.4)
@@ -70,6 +70,8 @@ export default function drawPie(chart, layer, s, index) {
 
     })
     .on('mouseover', function (d, i) {
+      if (!focusAnimation) return
+
       let ele = d3.select(this)
 
       let startOuter = outerRadius
@@ -87,6 +89,8 @@ export default function drawPie(chart, layer, s, index) {
 
     })
     .on('mouseout', function (d, i) {
+      if (!focusAnimation) return
+
       let ele = d3.select(this)
 
       let startOuter = outerRadius * defaultOptions.focusRate
