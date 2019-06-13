@@ -70,9 +70,12 @@ export function d3Augment(d3) {
   let appendProto = d3.selection.prototype.append
   if (!appendProto.lc_extended) {
     let append = function (name, attrs, styles) {
-      let [tagName, className] = name.split('.')
+      let [tagName, className] = name.split(/[.#]/)
       let s = appendProto.call(this, tagName)
-      className && s.classed(className, 'true')
+      if (className) {
+        name.includes('#') && s.attr('id', className)
+        name.includes('.') && s.classed(className, 'true')
+      }
       isObject(attrs) && s.attr(attrs)
       isObject(styles) && s.style(styles)
 

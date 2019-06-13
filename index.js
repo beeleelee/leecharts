@@ -10,6 +10,7 @@ import {
 import {
   isArray,
   isFunction,
+  randStr,
   debounce,
 } from 'mytoolkit'
 
@@ -164,9 +165,26 @@ class chart {
 
     this.sections.tooltip = this.paper.append('g.lc-tooltip')
 
+    this.setGridClip()
+
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
     })
+  }
+  setGridClip() {
+    let {
+      options: {
+        grid
+      },
+      sections: {
+        defs
+      },
+      containerWidth: cw,
+      containerHeight: ch,
+    } = this
+    let gridClip, gridClipId
+    this.gridClipId = gridClipId = randStr(8)
+
   }
   __onMousemove() {
     let {
