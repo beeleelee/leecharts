@@ -6,7 +6,6 @@ import {
   d3Augment,
   deepExtend,
   isInBound,
-  getData,
 } from './utils'
 import {
   isSet,
@@ -195,8 +194,6 @@ class chart {
 
     this.sections.axisY = this.paper.append('g.lc-axis-y')
 
-
-    // this.sections.linePointer = this.paper.append('line.lc-line-pointer')
     this.sections.shadowPointer = this.paper.append('rect.lc-shadow-pointer')
 
     this.sections.scrollXView = this.paper.append('g.lc-scroll-x-view')
@@ -253,10 +250,12 @@ class chart {
       if (orient === 'h') {
         i = Math.ceil((x - grid.left) / bandWidth) - 1
       } else {
-        i = Math.ceil((y - grid.bottom) / bandWidth) - 1
+        i = Math.floor((y - grid.bottom) / bandWidth) - 1
       }
-      i = Math.max(0, i)
+
       i = orient === 'v' ? l - i - 1 : i
+
+      i = Math.max(0, i)
       if (i !== activeCategroryIndex) {
         this.activeCategroryIndex = i
         emitter.emit('axisChange', i)

@@ -10,8 +10,6 @@ let gradientPool = []
 
 export default function drawGradient(chart, color, defaultColor) {
   let {
-    defaultOptions,
-    d3,
     sections: {
       defs
     }

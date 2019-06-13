@@ -7,7 +7,7 @@ export default function options() {
   return {
     grid: {
       left: 40,
-      top: 30,
+      top: 80,
       right: 40,
       bottom: 30
     },

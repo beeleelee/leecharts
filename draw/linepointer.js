@@ -47,7 +47,7 @@ export default function drawLinePointer(chart, index) {
       cd = getData(xAxis.data, index)
       x2 = x1 = scaleCategory(cd) + bandWidth * 0.5
       y1 = grid.top
-      y2 = ch - grid.top
+      y2 = ch - grid.bottom
     } else {
       cd = getData(yAxis.data, index)
       y1 = y2 = scaleCategory(cd) + bandWidth * 0.5
