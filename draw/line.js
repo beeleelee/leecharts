@@ -1,6 +1,7 @@
 import {
   isSet,
   extend,
+  randStr,
 } from 'mytoolkit'
 
 export default function drawLine(chart, layer, s, index) {
@@ -16,6 +17,7 @@ export default function drawLine(chart, layer, s, index) {
       yAxis,
     },
     sections: {
+      defs,
       series,
       plotGroup,
     },
@@ -43,6 +45,8 @@ export default function drawLine(chart, layer, s, index) {
   let sData = s.data || []
   sData.map(item => item && item.value ? item.value : item)
 
+
+
   if (s.areaStyle) {
     let area = d3.area()
       .x((d, i) => position(d, i, true))
@@ -69,9 +73,11 @@ export default function drawLine(chart, layer, s, index) {
   layer.safeSelect('path.lc-line')
     .attr('d', line(sData))
     .attrs({ stroke: color, fill: 'none' })
+
   let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
+  let currentPlotGroup
   if (plotStyle.show) {
-    let currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
+    currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
     let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
     let r = plotSetting.size / 2
 
@@ -96,6 +102,52 @@ export default function drawLine(chart, layer, s, index) {
       }
     })
   }
+  // ini clip path animation 
+  let clipPath, clipPathId, clipRect
+  if (chart.firstRender) {
+    clipPathId = 'lc-' + randStr(8)
+    clipPath = defs.safeSelect(`clipPath#${clipPathId}`)
+    clipRect = clipPath.safeSelect('rect')
+    layer.attr('clip-path', `url(#${clipPathId})`)
+    if (currentPlotGroup) {
+      currentPlotGroup.attr('clip-path', `url(#${clipPathId})`)
+    }
+    if (orient === 'h') {
+      clipRect.attrs({
+        x: 0,
+        y: 0,
+        height: ch,
+        width: 0
+      })
+        .transition()
+        .duration(defaultOptions.enterAniDuration)
+        .ease(defaultOptions.enterAniEase)
+        .attr('width', cw)
+        .on('end', () => {
+          layer.attr('clip-path', null)
+          currentPlotGroup && currentPlotGroup.attr('clip-path', null)
+          clipPath.remove()
+        })
+    } else {
+      clipRect.attrs({
+        x: 0,
+        y: ch,
+        height: 0,
+        width: cw
+      })
+        .transition()
+        .duration(defaultOptions.enterAniDuration)
+        .ease(defaultOptions.enterAniEase)
+        .attr('height', ch)
+        .attr('y', 0)
+        .on('end', () => {
+          layer.attr('clip-path', null)
+          currentPlotGroup && currentPlotGroup.attr('clip-path', null)
+          clipPath.remove()
+        })
+    }
+  }
+
 
   function position(d, i, isX) {
     let td, scale, bw

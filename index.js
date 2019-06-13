@@ -36,6 +36,7 @@ class chart {
     this.previousOptions = null
     this.sections = {}
     this.maxValue = 0
+    this.firstRender = true
 
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)
@@ -47,6 +48,7 @@ class chart {
     drawAxisX(this)
     drawAxisY(this)
     this.drawSeries()
+    this.firstRender = false
   }
   drawSeries() {
     let chart = this
@@ -152,6 +154,7 @@ class chart {
 
     this.sections.axisX = this.paper.append('g.lc-axis-x')
     this.sections.axisY = this.paper.append('g.lc-axis-y')
+
     // this.sections.linePointer = this.paper.append('line.lc-line-pointer')
     this.sections.shadowPointer = this.paper.append('rect.lc-shadow-pointer')
 
@@ -165,26 +168,9 @@ class chart {
 
     this.sections.tooltip = this.paper.append('g.lc-tooltip')
 
-    this.setGridClip()
-
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
     })
-  }
-  setGridClip() {
-    let {
-      options: {
-        grid
-      },
-      sections: {
-        defs
-      },
-      containerWidth: cw,
-      containerHeight: ch,
-    } = this
-    let gridClip, gridClipId
-    this.gridClipId = gridClipId = randStr(8)
-
   }
   __onMousemove() {
     let {
