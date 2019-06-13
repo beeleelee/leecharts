@@ -43,8 +43,8 @@ export default function drawLine(chart, layer, s, index) {
     orient = 'h'
   }
   let bandWidth = scaleCategory && scaleCategory.bandwidth ? scaleCategory.bandwidth() : 0
-  let sData = s.data || []
-  sData.map(item => item && item.value ? item.value : item)
+  let rData = s.data || []
+  let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
   let stacked = false
   if (s.stackData) {
@@ -79,7 +79,7 @@ export default function drawLine(chart, layer, s, index) {
     }
     let areaColor = s.areaStyle ? s.areaStyle.color : null
     areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
-    console.log('area color', areaColor)
+
     layer.safeSelect('path.lc-area')
       .attr('d', area(sData))
       .attrs({ stroke: 'none', fill: areaColor })
@@ -102,15 +102,35 @@ export default function drawLine(chart, layer, s, index) {
     let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
     let r = plotSetting.size / 2
 
-    currentPlotGroup.selectAll('circle.lc-node')
+    currentPlotGroup.selectAll('g.lc-node-wrap')
       .data(sData)
-      .join('circle.lc-node')
-      .attrs({
-        cx: (d, i) => position(d, i, true),
-        cy: (d, i) => position(d, i, false),
-        r: d => d ? r : 0,
-        fill: '#ffffff',
-        stroke: color
+      .join('g.lc-node-wrap')
+      .attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+      .each(function (d, i) {
+        let wrap = d3.select(this)
+
+        let bgCircle = wrap.safeSelect('circle.lc-bgcircle')
+          .attrs({ r: r * 3, stroke: 'none', fill: color, opacity: 0 })
+
+
+        let node = wrap.safeSelect('circle.lc-node')
+        node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
+          .on('mouseover', () => {
+            bgCircle
+              .attr('opacity', defaultOptions.bgCircleOpacity)
+          })
+          .on('mouseout', () => {
+            bgCircle
+              .attr('opacity', 0)
+          })
+          .on('click', () => {
+            emitter.emit('clickItem', {
+              value: stacked ? rData[i] : d,
+              seriesIndex: index,
+              dataIndex: i,
+              seriesData: s
+            })
+          })
       })
     emitter.on('axisChange', (i) => {
       let n = currentPlotGroup.selectAll(`.lc-active-node`)

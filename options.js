@@ -98,3 +98,5 @@ options.plot = {
   type: 'circle',
   size: 10
 }
+
+options.bgCircleOpacity = 0.4
