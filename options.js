@@ -55,12 +55,25 @@ let colors = [
   '#e4d354',
   '#2b908f'
 ]
+let areaColors = [
+  'rgba(124,181,236,.6)',
+  'rgba(67,67,72,.6)',
+  'rgba(144,237,125,.6)',
+  'rgba(247,163,92,.6)',
+  'rgba(128,133,233,.6)',
+  'rgba(241,92,128,.6)',
+  'rgba(228,211,84,.6)',
+  'rgba(43,144,143,.6)',
+]
 
 options.seriesColor = colors
 
 
 options.getColor = i => {
   return colors[i % colors.length]
+}
+options.getAreaColor = i => {
+  return areaColors[i % areaColors.length]
 }
 
 options.focusAniDuration = 300

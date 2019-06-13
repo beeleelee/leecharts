@@ -45,6 +45,11 @@ export default function drawLine(chart, layer, s, index) {
   let sData = s.data || []
   sData.map(item => item && item.value ? item.value : item)
 
+  let stacked = false
+  if (s.stackData) {
+    stacked = true
+    sData = s.stackData
+  }
 
 
   if (s.areaStyle) {
@@ -54,14 +59,27 @@ export default function drawLine(chart, layer, s, index) {
       .curve(d3.curveCardinal)
       .defined((d) => !!d)
     if (orient === 'h') {
-      area.y1(ch - grid.bottom)
-    } else {
-      area.x1(grid.left)
-    }
+      area.y1((d, i) => {
+        if (stacked) {
 
+          return scaleValue(d[0])
+        } else {
+          return ch - grid.bottom
+        }
+      })
+    } else {
+      area.x1((d, i) => {
+        if (stacked) {
+          return scaleValue(d[0])
+        } else {
+          return grid.left
+        }
+      })
+    }
+    let areaColor = s.areaStyle && s.areaStyle.color || defaultOptions.getAreaColor(index)
     layer.safeSelect('path.lc-area')
       .attr('d', area(sData))
-      .attrs({ stroke: 'none', fill: s.areaStyle.color || color })
+      .attrs({ stroke: 'none', fill: areaColor })
   }
 
   let line = d3.line()
@@ -82,7 +100,7 @@ export default function drawLine(chart, layer, s, index) {
     let r = plotSetting.size / 2
 
     currentPlotGroup.selectAll('circle.lc-node')
-      .data(s.data)
+      .data(sData)
       .join('circle.lc-node')
       .attrs({
         cx: (d, i) => position(d, i, true),
@@ -159,7 +177,7 @@ export default function drawLine(chart, layer, s, index) {
         bw = bandWidth
       } else {
         scale = scaleValue
-        td = d
+        td = stacked ? d[1] : d
         bw = 0
       }
     } else {
@@ -169,7 +187,7 @@ export default function drawLine(chart, layer, s, index) {
         bw = bandWidth
       } else {
         scale = scaleValue
-        td = d
+        td = stacked ? d[1] : d
         bw = 0
       }
     }
