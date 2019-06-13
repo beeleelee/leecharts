@@ -5,6 +5,7 @@ import {
 import {
   parsePercent
 } from '../utils'
+import drawGradient from './gradient'
 
 export default function drawPie(chart, layer, s, index) {
   let {
@@ -37,9 +38,21 @@ export default function drawPie(chart, layer, s, index) {
     .join('path.lc-arc')
     .attr('item-index', (d, i) => i)
     .attr('fill', (d, i) => {
-      return defaultOptions.getColor(i)
+      let itemData = data[i]
+      return drawGradient(chart, itemData.color, defaultOptions.getColor(i))
     })
     .on('click', function (d, i) {
+      if (!isSet(s.click) || s.click) {
+        emitter.emit('clickItem', {
+          value: d.data,
+          seriesIndex: index,
+          dataIndex: i,
+          seriesData: s
+        })
+      }
+
+      if (isSet(s.clickHighlight) && !s.clickHighlight) return
+
       let highlightIndex
 
       if (i === chart.highlightIndex) {
