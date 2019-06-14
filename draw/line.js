@@ -16,6 +16,7 @@ export default function drawLine(chart, layer, s, index) {
       grid,
       xAxis,
       yAxis,
+      lineStyle: optionsLineStyle
     },
     sections: {
       defs,
@@ -25,7 +26,9 @@ export default function drawLine(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-  let color = s.color || defaultOptions.getColor(index)
+  let lineStyle = extend({}, defaultOptions.lineStyle, (optionsLineStyle || {}), (s.lineStyle || {}))
+  let color = lineStyle.color || defaultOptions.getColor(index)
+  let lineCurve = lineStyle.curve
 
   let scaleCategory, scaleValue, orient
 
@@ -52,13 +55,14 @@ export default function drawLine(chart, layer, s, index) {
     sData = s.stackData
   }
 
-
-  if (s.areaStyle) {
+  let areaStyle = extend({}, defaultOptions.areaStyle, s.areaStyle || {})
+  if (areaStyle.show) {
     let area = d3.area()
       .x((d, i) => position(d, i, true))
       .y((d, i) => position(d, i, false))
-      .curve(d3.curveCardinal)
       .defined((d) => !!d)
+    lineStyle.curve && area.curve(d3.curveCardinal)
+
     if (orient === 'h') {
       area.y1((d, i) => {
         if (stacked) {
@@ -77,7 +81,7 @@ export default function drawLine(chart, layer, s, index) {
         }
       })
     }
-    let areaColor = s.areaStyle ? s.areaStyle.color : null
+    let areaColor = areaStyle.color || null
     areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
 
     layer.safeSelect('path.lc-area')
@@ -85,15 +89,17 @@ export default function drawLine(chart, layer, s, index) {
       .attrs({ stroke: 'none', fill: areaColor })
   }
 
-  let line = d3.line()
-    .x((d, i) => position(d, i, true))
-    .y((d, i) => position(d, i, false))
-    .curve(d3.curveCardinal)
-    .defined((d) => !!d)
+  if (lineStyle.show) {
+    let line = d3.line()
+      .x((d, i) => position(d, i, true))
+      .y((d, i) => position(d, i, false))
+      .defined((d) => !!d)
+    lineStyle.curve && line.curve(d3.curveCardinal)
 
-  layer.safeSelect('path.lc-line')
-    .attr('d', line(sData))
-    .attrs({ stroke: color, fill: 'none' })
+    layer.safeSelect('path.lc-line')
+      .attr('d', line(sData))
+      .attrs({ stroke: color, fill: 'none' })
+  }
 
   let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
   let currentPlotGroup
@@ -102,6 +108,9 @@ export default function drawLine(chart, layer, s, index) {
     let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
     let r = plotSetting.size / 2
 
+    currentPlotGroup.on('click', () => {
+      console.log('l  kks', s)
+    })
     currentPlotGroup.selectAll('g.lc-node-wrap')
       .data(sData)
       .join('g.lc-node-wrap')
@@ -189,6 +198,9 @@ export default function drawLine(chart, layer, s, index) {
     }
   }
 
+  layer.on('click', () => {
+    console.log('layer clicked', s)
+  })
 
   function position(d, i, isX) {
     let td, scale, bw

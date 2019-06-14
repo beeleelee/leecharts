@@ -100,3 +100,11 @@ options.plot = {
 }
 
 options.bgCircleOpacity = 0.4
+
+options.areaStyle = {
+  show: false
+}
+options.lineStyle = {
+  show: true,
+  curve: false
+}
