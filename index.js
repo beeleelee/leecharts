@@ -19,6 +19,7 @@ import drawLine from './draw/line'
 import drawBar from './draw/bar'
 import drawPie from './draw/pie'
 import drawLinePointer from './draw/linepointer'
+import drawLegend from './draw/legend'
 import emitter from './emitter'
 
 d3Augment(d3)
@@ -48,6 +49,7 @@ class chart {
     drawAxisX(this)
     drawAxisY(this)
     this.drawSeries()
+    drawLegend(this)
     this.firstRender = false
   }
   drawSeries() {
@@ -203,6 +205,7 @@ class chart {
     this.sections.linePointer = this.sections.scrollXView.append('line.lc-line-pointer')
     this.sections.plotGroup = this.sections.scrollXView.append('g.lc-plot-group')
 
+    this.sections.legend = this.paper.append('g.lc-legend')
     this.sections.labels = this.paper.append('g.lc-labels')
     this.sections.title = this.paper.append('text.lc-title')
     this.sections.subtitle = this.paper.append('text.lc-subtitle')
