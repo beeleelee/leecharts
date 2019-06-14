@@ -44,6 +44,7 @@ class chart {
 
   }
   drawChart() {
+    this.emitter.clear('highlightChange')
     drawAxisX(this)
     drawAxisY(this)
     this.drawSeries()

@@ -1,5 +1,6 @@
 import {
   isSet,
+  isUnset,
   extend,
   randStr,
 } from 'mytoolkit'
@@ -16,7 +17,6 @@ export default function drawLine(chart, layer, s, index) {
       grid,
       xAxis,
       yAxis,
-      lineStyle: optionsLineStyle
     },
     sections: {
       defs,
@@ -26,9 +26,8 @@ export default function drawLine(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-  let lineStyle = extend({}, defaultOptions.lineStyle, (optionsLineStyle || {}), (s.lineStyle || {}))
+  let lineStyle = extend({}, defaultOptions.lineStyle, (s.lineStyle || {}))
   let color = lineStyle.color || defaultOptions.getColor(index)
-  let lineCurve = lineStyle.curve
 
   let scaleCategory, scaleValue, orient
 
@@ -109,7 +108,9 @@ export default function drawLine(chart, layer, s, index) {
     let r = plotSetting.size / 2
 
     currentPlotGroup.on('click', () => {
-      console.log('l  kks', s)
+      if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+
+      emitter.emit('highlightChange', index)
     })
     currentPlotGroup.selectAll('g.lc-node-wrap')
       .data(sData)
@@ -199,7 +200,13 @@ export default function drawLine(chart, layer, s, index) {
   }
 
   layer.on('click', () => {
-    console.log('layer clicked', s)
+    if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+
+    emitter.emit('highlightChange', index)
+  })
+
+  emitter.on('highlightChange', (ci) => {
+
   })
 
   function position(d, i, isX) {

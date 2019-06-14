@@ -1,4 +1,7 @@
-import { isFunction } from "mytoolkit"
+import {
+  isFunction,
+  isUnset,
+} from "mytoolkit"
 
 
 class emitter {
@@ -8,7 +11,10 @@ class emitter {
   on(type, func) {
     let listenersByType = this.listeners[type]
     !listenersByType && (this.listeners[type] = listenersByType = [])
-    listenersByType.push(func)
+    // find previous func with same id 
+    if (!listenersByType.find(l => l === func)) {
+      listenersByType.push(func)
+    }
   }
   off(type, func) {
     let listenersByType = this.listeners[type]
@@ -22,6 +28,16 @@ class emitter {
       listenersByType.forEach(l => {
         l(...arg)
       })
+    }
+  }
+  clear(type) {
+    if (isUnset(type)) {
+      this.listeners = {}
+      return
+    }
+    let listenersByType = this.listeners[type]
+    if (listenersByType && listenersByType.length) {
+      this.listeners[type] = []
     }
   }
 }
