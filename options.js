@@ -108,3 +108,5 @@ options.lineStyle = {
   show: true,
   curve: false
 }
+
+options.highlightOtherOpacity = 0.4

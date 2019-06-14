@@ -110,7 +110,8 @@ export default function drawLine(chart, layer, s, index) {
     currentPlotGroup.on('click', () => {
       if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
 
-      emitter.emit('highlightChange', index)
+      chart.highlightIndex = chart.highlightIndex === index ? null : index
+      emitter.emit('highlightChange', chart.highlightIndex)
     })
     currentPlotGroup.selectAll('g.lc-node-wrap')
       .data(sData)
@@ -202,12 +203,34 @@ export default function drawLine(chart, layer, s, index) {
   layer.on('click', () => {
     if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
 
-    emitter.emit('highlightChange', index)
+    chart.highlightIndex = chart.highlightIndex === index ? null : index
+    emitter.emit('highlightChange', chart.highlightIndex)
   })
 
-  emitter.on('highlightChange', (ci) => {
+  if (isUnset(s.highlightAnimation) || s.highlightAnimation) {
+    emitter.on('highlightChange', (ci) => {
+      if (ci === null || ci === index) {
+        layer.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', 1)
 
-  })
+        if (currentPlotGroup) {
+          currentPlotGroup.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .style('opacity', 1)
+        }
+      } else {
+        layer.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', defaultOptions.highlightOtherOpacity)
+        if (currentPlotGroup) {
+          currentPlotGroup.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .style('opacity', defaultOptions.highlightOtherOpacity)
+        }
+      }
+    })
+  }
 
   function position(d, i, isX) {
     let td, scale, bw

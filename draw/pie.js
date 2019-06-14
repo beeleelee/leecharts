@@ -75,7 +75,7 @@ export default function drawPie(chart, layer, s, index) {
       } else {
         otherPieItems.transition()
           .duration(defaultOptions.focusAniDuration)
-          .style('opacity', 0.4)
+          .style('opacity', defaultOptions.highlightOtherOpacity)
         curEle.transition()
           .duration(defaultOptions.focusAniDuration)
           .style('opacity', 1)
