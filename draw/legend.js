@@ -65,20 +65,36 @@ export default function drawLegend(chart) {
 
   // legend layout 
   let layoutX = legend.left + legend.padding
+  let layoutRight = cw - legend.right - legend.padding
   let layoutWidth = cw - legend.right - legend.padding - layoutX
   let penX, penY, leftSpace
-  if (legend.layout === 'horizontal') {
-    console.log('------')
-    if (legend.align === 'right') {
 
-    } else {
-      console.log('+++++++++=')
+  if (legend.layout === 'horizontal') {
+    penX = layoutX
+    penY = legend.top + lineHeight / 2
+    leftSpace = layoutWidth
+
+    if (legend.align === 'right') {
+      let j = 0
       for (let i = 0, l = legendWraps.length; i < l; i++) {
-        if (i === 0) {
-          penX = layoutX
-          penY = legend.top + lineHeight / 2
+        let item = legendWraps[i]
+        if (item.width <= leftSpace) {
+          leftSpace -= item.width - legend.padding
+        } else {
           leftSpace = layoutWidth
+          penX = layoutRight
+          console.log(i)
+          for (let k = i; k > j; k--) {
+            penX -= item.width
+            item.ele.attr('transform', `translate(${penX},${penY})`)
+            penX -= legend.padding
+          }
+          j = i + 1
         }
+      }
+    } else {
+
+      for (let i = 0, l = legendWraps.length; i < l; i++) {
         let item = legendWraps[i]
         if (item.width <= leftSpace) {
           item.ele.attr('transform', `translate(${penX},${penY})`)
@@ -87,7 +103,6 @@ export default function drawLegend(chart) {
           penY += lineHeight
           item.ele.attr('transform', `translate(${penX},${penY})`)
         }
-        console.log(penX, penY, leftSpace)
         penX += item.width + legend.padding
         leftSpace -= item.width - legend.padding
       }
@@ -103,8 +118,8 @@ export default function drawLegend(chart) {
     let iconColor = d.color || defaultOptions.getColor(i)
     switch (d.icon) {
       case 'lineCircle':
-        r += `<path stroke-width="2" stroke="${iconColor}" d="M0,${(fontSize + 2) / 2}L${iconSize * 2},${(fontSize + 2) / 2}"/>`
-        r += `<circle stroke-width="2" stroke="${iconColor}" fill="#ffffff" cx="${iconSize}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
+        r += `<path stroke-width="2" stroke="${iconColor}" d="M0,${(fontSize + 2) / 2}L${iconSize * 1.8},${(fontSize + 2) / 2}"/>`
+        r += `<circle stroke-width="2" stroke="${iconColor}" fill="#ffffff" cx="${iconSize * 0.9}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       case 'rect':
         return r
