@@ -63,6 +63,41 @@ export default function drawLegend(chart) {
       }
     })
 
+  // legend layout 
+  let layoutX = legend.left + legend.padding
+  let layoutWidth = cw - legend.right - legend.padding - layoutX
+  let penX, penY, leftSpace
+  if (legend.layout === 'horizontal') {
+    console.log('------')
+    if (legend.align === 'right') {
+
+    } else {
+      console.log('+++++++++=')
+      for (let i = 0, l = legendWraps.length; i < l; i++) {
+        if (i === 0) {
+          penX = layoutX
+          penY = legend.top + lineHeight / 2
+          leftSpace = layoutWidth
+        }
+        let item = legendWraps[i]
+        if (item.width <= leftSpace) {
+          item.ele.attr('transform', `translate(${penX},${penY})`)
+        } else {
+          penX = layoutX
+          penY += lineHeight
+          item.ele.attr('transform', `translate(${penX},${penY})`)
+        }
+        console.log(penX, penY, leftSpace)
+        penX += item.width + legend.padding
+        leftSpace -= item.width - legend.padding
+      }
+    }
+  } else {
+
+  }
+
+
+
   function icon(d, i) {
     let r = ''
     let iconColor = d.color || defaultOptions.getColor(i)
