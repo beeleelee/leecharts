@@ -45,6 +45,9 @@ export default function options() {
       bottom: 0,
       padding: 10,
       fontSize: 12,
+      fontWeight: 555,
+      lineHeight: 20,
+      iconSize: 12
     },
     series: [],
   }
@@ -115,3 +118,11 @@ options.lineStyle = {
 }
 
 options.highlightOtherOpacity = 0.2
+
+let ldicons = {
+  'line': 'lineCircle',
+  'bar': 'rect',
+}
+options.legendIcon = (type) => {
+  return ldicons[type] || 'circle'
+}
