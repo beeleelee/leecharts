@@ -120,17 +120,20 @@ export default function drawPie(chart, layer, s, index) {
         })
 
     })
-
-  pieItems
-    .transition()
-    .duration(defaultOptions.enterAniDuration)
-    .ease(defaultOptions.enterAniEase)
-    .attrTween('d', function (d, i) {
-      let inter = d3.interpolate(d.startAngle, d.endAngle)
-      return t => {
-        return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
-      }
-    })
+  if (!isSet(s.enterAnimation) || s.enterAnimation) {
+    pieItems
+      .transition()
+      .duration(defaultOptions.enterAniDuration)
+      .ease(defaultOptions.enterAniEase)
+      .attrTween('d', function (d, i) {
+        let inter = d3.interpolate(d.startAngle, d.endAngle)
+        return t => {
+          return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
+        }
+      })
+  } else {
+    pieItems.attr('d', d3arc)
+  }
 
   // draw label 
   if (s.label && isFunction(s.label.formatter)) {
