@@ -109,4 +109,4 @@ options.lineStyle = {
   curve: false
 }
 
-options.highlightOtherOpacity = 0.4
+options.highlightOtherOpacity = 0.2
