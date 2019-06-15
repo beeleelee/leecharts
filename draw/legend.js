@@ -69,9 +69,9 @@ export default function drawLegend(chart) {
   let layoutWidth = cw - legend.right - legend.padding - layoutX
   let penX, penY, leftSpace, rows = [[]], rowIndex = 0
 
+  penX = layoutX
+  penY = legend.top + lineHeight / 2
   if (legend.layout === 'horizontal') {
-    penX = layoutX
-    penY = legend.top + lineHeight / 2
     leftSpace = layoutWidth
 
     for (let i = 0, l = legendWraps.length; i < l; i++) {
@@ -106,7 +106,14 @@ export default function drawLegend(chart) {
       penY += lineHeight
     })
   } else {
-
+    let maxItemWidth = Math.max.apply(this, legendWraps.map(l => l.width))
+    console.log(maxItemWidth)
+    legend.align === 'right' && (penX = layoutRight - maxItemWidth - legend.padding)
+    for (let i = 0, l = legendWraps.length; i < l; i++) {
+      let item = legendWraps[i]
+      item.ele.attr('transform', `translate(${penX},${penY})`)
+      penY += lineHeight
+    }
   }
 
 
@@ -120,11 +127,10 @@ export default function drawLegend(chart) {
         r += `<circle stroke-width="2" stroke="${iconColor}" fill="#ffffff" cx="${iconSize * 0.9}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       case 'rect':
-
+        r += `<rect stroke="none" fill="${iconColor}" y="${(iconSize + 1 - fontSize)}" width="${iconSize}" height="${iconSize}"/>`
         return r
       case 'circle':
-        r += `<rect stroke="none" fill="${iconColor}" y="${(iconSize + 1 - fontSize)}" width="${iconSize}" height="${iconSize}"/>`
-        //r += `<circle stroke="none" fill="${iconColor}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
+        r += `<circle stroke="none" fill="${iconColor}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       default:
         return r
