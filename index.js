@@ -48,6 +48,7 @@ class chart {
     this.emitter.clear('highlightChange')
     drawAxisX(this)
     drawAxisY(this)
+    this.calculateBarOffset()
     this.drawSeries()
     drawLegend(this)
     this.firstRender = false
@@ -154,6 +155,35 @@ class chart {
       s.stackGroupLength = sgx + 1
     })
   }
+  calculateBarOffset() {
+    let {
+      defaultOptions,
+      d3,
+      options: {
+        series
+      },
+      scaleY,
+      scaleX,
+    } = this
+
+    let barSeries = series.filter(s => s.type === 'bar')
+    if (!barSeries.length) return
+
+    let scaleCategory, bandWidth, orient
+
+    if (scaleX.bandwidth) {
+      scaleCategory = scaleX
+      orient = 'h'
+    } else if (scaleY.bandwidth) {
+      scaleCategory = scaleY
+      orient = 'v'
+    } else {
+      // to do: dealing with charts without category for both xAxis and yAxis
+      return
+    }
+    bandWidth = scaleCategory.bandwidth()
+
+  }
   calculateMaxValue() {
     let {
       options: {
@@ -199,6 +229,7 @@ class chart {
     this.figureGeometry()
     this.calculateStackData()
     this.calculateMaxValue()
+
 
     this.paper
       .on('mousemove', function () {
