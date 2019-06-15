@@ -26,7 +26,7 @@ export default function drawBar(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-
+  console.log(s)
   let scaleCategory, scaleValue, orient, barWidth, barOffset
   barWidth = s._barWidth
   barOffset = s._barOffset
@@ -63,13 +63,13 @@ export default function drawBar(chart, layer, s, index) {
     .attrs({
       x: (d, i) => {
         if (orient === 'v') {
-          return grid.left
+          return stacked ? scaleValue(d[0]) : grid.left
         }
         return position(d, i, true) + barOffset
       },
       y: (d, i) => {
         if (orient === 'h') {
-          return ch - grid.bottom
+          return stacked ? scaleValue(d[0]) : ch - grid.bottom
         }
         return position(d, i, false) + barOffset
       },
@@ -97,11 +97,11 @@ export default function drawBar(chart, layer, s, index) {
       .ease(defaultOptions.enterAniEase)
       .attr('height', function (d, i) {
         let y = position(d, i, false)
-        return ch - grid.bottom - y
+        return stacked ? scaleValue(d[0]) - y : ch - grid.bottom - y
       })
       .attrTween('y', function (d, i) {
         let end = position(d, i, false)
-        let start = ch - grid.bottom
+        let start = stacked ? scaleValue(d[0]) : ch - grid.bottom
 
         return d3.interpolate(start, end)
       })
@@ -111,7 +111,7 @@ export default function drawBar(chart, layer, s, index) {
       .ease(defaultOptions.enterAniEase)
       .attr('width', function (d, i) {
         let x = position(d, i, true)
-        return x - grid.left
+        return stacked ? x - scaleValue(d[0]) : x - grid.left
       })
   }
 
@@ -205,7 +205,7 @@ export default function drawBar(chart, layer, s, index) {
   // }
 
   function position(d, i, isX) {
-    let td, scale, bw
+    let td, scale
 
     if (isX) {
       if (orient === 'h') {
