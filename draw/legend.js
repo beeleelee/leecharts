@@ -67,8 +67,19 @@ export default function drawLegend(chart) {
   let layoutX = legend.left + legend.padding
   let layoutRight = cw - legend.right - legend.padding
   let layoutWidth = cw - legend.right - legend.padding - layoutX
-  let penX, penY, leftSpace
-
+  let penX, penY, leftSpace, rows = [[]], rowIndex = 0
+  for (let i = 0, l = legendWraps.length; i < l; i++) {
+    let item = legendWraps[i]
+    let row = rows[rowIndex]
+    if (item.width <= leftSpace) {
+      row.push(item)
+    } else {
+      rowIndex++
+      row = rows[rowIndex] = []
+      row.push(item)
+    }
+  }
+  console.log(rows)
   if (legend.layout === 'horizontal') {
     penX = layoutX
     penY = legend.top + lineHeight / 2
