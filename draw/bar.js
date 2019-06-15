@@ -26,10 +26,10 @@ export default function drawBar(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-  let lineStyle = extend({}, defaultOptions.lineStyle, (s.lineStyle || {}))
-  let color = lineStyle.color || defaultOptions.getColor(index)
 
-  let scaleCategory, scaleValue, orient
+  let scaleCategory, scaleValue, orient, barWidth, barOffset
+  barWidth = s._barWidth
+  barOffset = s._barOffset
 
   if (scaleX.bandwidth) {
     scaleCategory = scaleX
@@ -54,151 +54,123 @@ export default function drawBar(chart, layer, s, index) {
     sData = s.stackData
   }
 
-  let areaStyle = extend({}, defaultOptions.areaStyle, s.areaStyle || {})
-  if (areaStyle.show) {
-    let area = d3.area()
-      .x((d, i) => position(d, i, true))
-      .y((d, i) => position(d, i, false))
-      .defined((d) => !!d)
-    lineStyle.curve && area.curve(d3.curveCardinal)
+  let barStyle = extend({}, defaultOptions.barStyle, s.barStyle || {})
+  let barColor = drawGradient(chart, (barStyle.color || null), defaultOptions.getColor(index))
 
-    if (orient === 'h') {
-      area.y1((d, i) => {
-        if (stacked) {
-
-          return scaleValue(d[0])
-        } else {
-          return ch - grid.bottom
-        }
-      })
-    } else {
-      area.x1((d, i) => {
-        if (stacked) {
-          return scaleValue(d[0])
-        } else {
+  let bars = layer.selectAll('rect.lc-bar')
+    .data(sData)
+    .join('rect.lc-bar')
+    .attrs({
+      x: (d, i) => {
+        if (orient === 'v') {
           return grid.left
         }
-      })
-    }
-    let areaColor = areaStyle.color || null
-    areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
+        return position(d, i, true) + barOffset
+      },
+      y: (d, i) => {
+        if (orient === 'h') {
+          return ch - grid.bottom
+        }
+        return position(d, i, false) + barOffset
+      },
+      width: function (d, i) {
+        if (orient === 'h') {
+          return barWidth
+        }
 
-    layer.safeSelect('path.lc-area')
-      .attr('d', area(sData))
-      .attrs({ stroke: 'none', fill: areaColor })
-  }
+        return 0
+      },
+      height: function (d, i) {
+        if (orient === 'v') {
+          return barWidth
+        }
 
-  if (lineStyle.show) {
-    let line = d3.line()
-      .x((d, i) => position(d, i, true))
-      .y((d, i) => position(d, i, false))
-      .defined((d) => !!d)
-    lineStyle.curve && line.curve(d3.curveCardinal)
-
-    layer.safeSelect('path.lc-line')
-      .attr('d', line(sData))
-      .attrs({ stroke: color, fill: 'none' })
-  }
-
-  let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
-  let currentPlotGroup
-  if (plotStyle.show) {
-    currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
-    let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
-    let r = plotSetting.size / 2
-
-    currentPlotGroup.on('click', () => {
-      if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
-
-      chart.highlightIndex = chart.highlightIndex === index ? null : index
-      emitter.emit('highlightChange', chart.highlightIndex)
+        return 0
+      },
+      stroke: 'none',
+      fill: barColor
     })
-    currentPlotGroup.selectAll('g.lc-node-wrap')
-      .data(sData)
-      .join('g.lc-node-wrap')
-      .attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
-      .each(function (d, i) {
-        let wrap = d3.select(this)
 
-        let bgCircle = wrap.safeSelect('circle.lc-bgcircle')
-          .attrs({ r: r * 3, stroke: 'none', fill: color, opacity: 0 })
-
-
-        let node = wrap.safeSelect('circle.lc-node')
-        node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
-          .on('mouseover', () => {
-            bgCircle
-              .attr('opacity', defaultOptions.bgCircleOpacity)
-          })
-          .on('mouseout', () => {
-            bgCircle
-              .attr('opacity', 0)
-          })
-          .on('click', () => {
-            emitter.emit('clickItem', {
-              value: stacked ? rData[i] : d,
-              seriesIndex: index,
-              dataIndex: i,
-              seriesData: s
-            })
-          })
+  if (orient === 'h') {
+    bars.transition()
+      .duration(defaultOptions.enterAniDuration)
+      .ease(defaultOptions.enterAniEase)
+      .attr('height', function (d, i) {
+        let y = position(d, i, false)
+        return ch - grid.bottom - y
       })
-    emitter.on('axisChange', (i) => {
-      let n = currentPlotGroup.selectAll(`.lc-active-node`)
-      !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
-      if (i !== null) {
-        currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
-          .classed('lc-active-node', true)
-          .transition().duration(defaultOptions.focusAniDuration)
-          .attr('r', r * 1.5)
-      }
-    })
+      .attrTween('y', function (d, i) {
+        let end = position(d, i, false)
+        let start = ch - grid.bottom
+
+        return d3.interpolate(start, end)
+      })
+  } else {
+    bars.transition()
+      .duration(defaultOptions.enterAniDuration)
+      .ease(defaultOptions.enterAniEase)
+      .attr('width', function (d, i) {
+        let x = position(d, i, true)
+        return x - grid.left
+      })
   }
-  // ini clip path animation 
-  let clipPath, clipPathId, clipRect
-  if (chart.firstRender) {
-    clipPathId = 'lc-' + randStr(8)
-    clipPath = defs.safeSelect(`clipPath#${clipPathId}`)
-    clipRect = clipPath.safeSelect('rect')
-    layer.attr('clip-path', `url(#${clipPathId})`)
-    if (currentPlotGroup) {
-      currentPlotGroup.attr('clip-path', `url(#${clipPathId})`)
-    }
-    if (orient === 'h') {
-      clipRect.attrs({
-        x: 0,
-        y: 0,
-        height: ch,
-        width: 0
-      })
-        .transition()
-        .duration(defaultOptions.enterAniDuration)
-        .ease(defaultOptions.enterAniEase)
-        .attr('width', cw)
-        .on('end', () => {
-          layer.attr('clip-path', null)
-          currentPlotGroup && currentPlotGroup.attr('clip-path', null)
-          clipPath.remove()
-        })
-    } else {
-      clipRect.attrs({
-        x: 0,
-        y: ch,
-        height: 0,
-        width: cw
-      })
-        .transition()
-        .duration(defaultOptions.enterAniDuration)
-        .ease(defaultOptions.enterAniEase)
-        .attr('height', ch)
-        .attr('y', 0)
-        .on('end', () => {
-          layer.attr('clip-path', null)
-          currentPlotGroup && currentPlotGroup.attr('clip-path', null)
-          clipPath.remove()
-        })
-    }
-  }
+
+
+  // let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
+  // let currentPlotGroup
+  // if (plotStyle.show) {
+  //   currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
+  //   let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
+  //   let r = plotSetting.size / 2
+
+  //   currentPlotGroup.on('click', () => {
+  //     if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+
+  //     chart.highlightIndex = chart.highlightIndex === index ? null : index
+  //     emitter.emit('highlightChange', chart.highlightIndex)
+  //   })
+  //   currentPlotGroup.selectAll('g.lc-node-wrap')
+  //     .data(sData)
+  //     .join('g.lc-node-wrap')
+  //     .attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+  //     .each(function (d, i) {
+  //       let wrap = d3.select(this)
+
+  //       let bgCircle = wrap.safeSelect('circle.lc-bgcircle')
+  //         .attrs({ r: r * 3, stroke: 'none', fill: color, opacity: 0 })
+
+
+  //       let node = wrap.safeSelect('circle.lc-node')
+  //       node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
+  //         .on('mouseover', () => {
+  //           bgCircle
+  //             .attr('opacity', defaultOptions.bgCircleOpacity)
+  //         })
+  //         .on('mouseout', () => {
+  //           bgCircle
+  //             .attr('opacity', 0)
+  //         })
+  //         .on('click', () => {
+  //           emitter.emit('clickItem', {
+  //             value: stacked ? rData[i] : d,
+  //             seriesIndex: index,
+  //             dataIndex: i,
+  //             seriesData: s
+  //           })
+  //         })
+  //     })
+  //   emitter.on('axisChange', (i) => {
+  //     let n = currentPlotGroup.selectAll(`.lc-active-node`)
+  //     !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
+  //     if (i !== null) {
+  //       currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
+  //         .classed('lc-active-node', true)
+  //         .transition().duration(defaultOptions.focusAniDuration)
+  //         .attr('r', r * 1.5)
+  //     }
+  //   })
+  // }
+
 
   // layer.on('click', () => {
   //   if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
@@ -239,23 +211,19 @@ export default function drawBar(chart, layer, s, index) {
       if (orient === 'h') {
         scale = scaleCategory
         td = xAxis.data[i]
-        bw = bandWidth
       } else {
         scale = scaleValue
         td = stacked ? d[1] : d
-        bw = 0
       }
     } else {
       if (orient === 'v') {
         scale = scaleCategory
         td = yAxis.data[i]
-        bw = bandWidth
       } else {
         scale = scaleValue
         td = stacked ? d[1] : d
-        bw = 0
       }
     }
-    return scale(td) + bw / 2
+    return scale(td)
   }
 }

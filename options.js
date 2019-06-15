@@ -126,3 +126,7 @@ let ldicons = {
 options.legendIcon = (type) => {
   return ldicons[type] || 'circle'
 }
+
+options.barStyle = {
+
+}
