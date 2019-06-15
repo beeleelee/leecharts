@@ -105,24 +105,6 @@ export default function drawLegend(chart) {
       }
       penY += lineHeight
     })
-
-    // if (legend.align === 'right') {
-
-    // } else {
-
-    //   for (let i = 0, l = legendWraps.length; i < l; i++) {
-    //     let item = legendWraps[i]
-    //     if (item.width <= leftSpace) {
-    //       item.ele.attr('transform', `translate(${penX},${penY})`)
-    //     } else {
-    //       penX = layoutX
-    //       penY += lineHeight
-    //       item.ele.attr('transform', `translate(${penX},${penY})`)
-    //     }
-    //     penX += item.width + legend.padding
-    //     leftSpace -= item.width - legend.padding
-    //   }
-    // }
   } else {
 
   }
@@ -138,8 +120,11 @@ export default function drawLegend(chart) {
         r += `<circle stroke-width="2" stroke="${iconColor}" fill="#ffffff" cx="${iconSize * 0.9}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       case 'rect':
+
         return r
       case 'circle':
+        r += `<rect stroke="none" fill="${iconColor}" y="${(iconSize + 1 - fontSize)}" width="${iconSize}" height="${iconSize}"/>`
+        //r += `<circle stroke="none" fill="${iconColor}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       default:
         return r
