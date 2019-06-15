@@ -109,19 +109,16 @@ class chart {
         series = []
       }
     } = this
+    let types = ['line', 'bar']
+    types.forEach(type => {
+      let chartsByType = series.filter(s => s.type === type)
+      let chartsByStack = chartsByType.filter(s => !!s.stack)
+      if (!chartsByStack.length) return
 
-    let lineCharts = series.filter(s => s.type === 'line')
-    let barCharts = series.filter(s => s.type === 'bar')
-
-    let lineHasStack = lineCharts.filter(s => !!s.stack)
-    let barHasStack = barCharts.filter(s => !!s.stack)
-
-    // line has stack 
-    if (lineHasStack.length) {
-      let lineStackGroups = groupBy(lineHasStack, 'stack')
-      Object.keys(lineStackGroups)
+      let stackGroups = groupBy(chartsByStack, 'stack')
+      Object.keys(stackGroups)
         .forEach(k => {
-          let group = lineStackGroups[k]
+          let group = stackGroups[k]
           let stackedData = []
           group.forEach((item, idx) => {
             if (stackedData.length === 0) {
@@ -138,7 +135,24 @@ class chart {
             stackedData = itemStackData.map(item => item[1])
           })
         })
+    })
+
+    // set bar index 
+    let barSeries = series.filter(s => s.type === 'bar')
+    let sgx = -1, stackName
+    for (let i = 0, l = barSeries.length; i < l; i++) {
+      let s = barSeries[i]
+      if (!isSet(s.stack) || s.stack === '') {
+        sgx++
+      } else if (s.stack !== stackName) {
+        sgx++
+        stackName = s.stack
+      }
+      s.stackGroupIndex = sgx
     }
+    barSeries.forEach(s => {
+      s.stackGroupLength = sgx + 1
+    })
   }
   calculateMaxValue() {
     let {
