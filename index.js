@@ -182,7 +182,31 @@ class chart {
       return
     }
     bandWidth = scaleCategory.bandwidth()
+    let b, groupIdx = -1, expectedBarWidth, groupLength, barWidth, barMinWidth, barMaxWidth, cache = []
+    groupLength = barSeries[0]['stackGroupLength']
+    expectedBarWidth = (bandWidth / groupLength) - 5
 
+    for (let i = 0, l = barSeries.length; i < l; i++) {
+      b = barSeries[i]
+      if (b.stackGroupIndex > groupIdx) {
+        if (b.barWidth) {
+          cache.push(b.barWidth)
+          break
+        }
+        barMinWidth = b.barMinWidth || 0
+        barMaxWidth = b.barMaxWidth || expectedBarWidth
+        barWidth = Math.min(Math.max(barMinWidth, expectedBarWidth), barMaxWidth)
+        cache.push(barWidth)
+        groupIdx++
+      }
+    }
+    let space = Math.max(0, bandWidth - cache.reduce((a, b) => a + b)) / (groupLength + 1)
+    barSeries.forEach(b => {
+      let gIdx = b.stackGroupIndex
+      b._barOffset = space + (gIdx > 0 ? cache[gIdx - 1] : 0)
+      b._barWidth = cache[gIdx]
+    })
+    // console.log(barSeries)
   }
   calculateMaxValue() {
     let {
