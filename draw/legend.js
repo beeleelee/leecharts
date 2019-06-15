@@ -34,7 +34,7 @@ export default function drawLegend(chart) {
       ...l,
     }
   })
-  console.log(legendData)
+
   // set legend layer invisiable 
   // legendLayer.style('opacity', 0)
   let fontSize = legend.fontSize
@@ -47,10 +47,10 @@ export default function drawLegend(chart) {
     .join('g.lc-legend-item-wrap')
     .each(function (d, i) {
       let ele = d3.select(this)
-      let html = '', x = iconSize + 10
+      let html = '', x = iconSize + 6
       html += icon(d, i)
       if (d.icon === 'lineCircle') {
-        x = iconSize * 2 + 10
+        x = iconSize * 1.8 + 6
       }
       html += `<text x=${x} y=${fontSize} style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${d.name}</text>`
       ele.html(html)
@@ -68,56 +68,61 @@ export default function drawLegend(chart) {
   let layoutRight = cw - legend.right - legend.padding
   let layoutWidth = cw - legend.right - legend.padding - layoutX
   let penX, penY, leftSpace, rows = [[]], rowIndex = 0
-  for (let i = 0, l = legendWraps.length; i < l; i++) {
-    let item = legendWraps[i]
-    let row = rows[rowIndex]
-    if (item.width <= leftSpace) {
-      row.push(item)
-    } else {
-      rowIndex++
-      row = rows[rowIndex] = []
-      row.push(item)
-    }
-  }
-  console.log(rows)
+
   if (legend.layout === 'horizontal') {
     penX = layoutX
     penY = legend.top + lineHeight / 2
     leftSpace = layoutWidth
 
-    if (legend.align === 'right') {
-      let j = 0
-      for (let i = 0, l = legendWraps.length; i < l; i++) {
-        let item = legendWraps[i]
-        if (item.width <= leftSpace) {
-          leftSpace -= item.width - legend.padding
-        } else {
-          leftSpace = layoutWidth
-          penX = layoutRight
-          console.log(i)
-          for (let k = i; k > j; k--) {
-            penX -= item.width
-            item.ele.attr('transform', `translate(${penX},${penY})`)
-            penX -= legend.padding
-          }
-          j = i + 1
-        }
-      }
-    } else {
-
-      for (let i = 0, l = legendWraps.length; i < l; i++) {
-        let item = legendWraps[i]
-        if (item.width <= leftSpace) {
-          item.ele.attr('transform', `translate(${penX},${penY})`)
-        } else {
-          penX = layoutX
-          penY += lineHeight
-          item.ele.attr('transform', `translate(${penX},${penY})`)
-        }
-        penX += item.width + legend.padding
-        leftSpace -= item.width - legend.padding
+    for (let i = 0, l = legendWraps.length; i < l; i++) {
+      let item = legendWraps[i]
+      let row = rows[rowIndex]
+      if (item.width <= leftSpace) {
+        row.push(item)
+        leftSpace -= (item.width + legend.padding)
+      } else {
+        rowIndex++
+        row = rows[rowIndex] = []
+        row.push(item)
+        leftSpace = layoutWidth
       }
     }
+
+    rows.forEach((row, rowIndex) => {
+      let right = legend.align === 'right'
+      right && (penX = layoutRight)
+      for (let i = 0, l = row.length; i < l; i++) {
+        let item
+        if (right) {
+          item = row[l - 1 - i]
+          penX -= (item.width + legend.padding)
+          item.ele.attr('transform', `translate(${penX},${penY})`)
+        } else {
+          item = row[i]
+          item.ele.attr('transform', `translate(${penX},${penY})`)
+          penX += (item.width + legend.padding)
+        }
+      }
+      penY += lineHeight
+    })
+
+    // if (legend.align === 'right') {
+
+    // } else {
+
+    //   for (let i = 0, l = legendWraps.length; i < l; i++) {
+    //     let item = legendWraps[i]
+    //     if (item.width <= leftSpace) {
+    //       item.ele.attr('transform', `translate(${penX},${penY})`)
+    //     } else {
+    //       penX = layoutX
+    //       penY += lineHeight
+    //       item.ele.attr('transform', `translate(${penX},${penY})`)
+    //     }
+    //     penX += item.width + legend.padding
+    //     leftSpace -= item.width - legend.padding
+    //   }
+    // }
   } else {
 
   }
