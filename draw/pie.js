@@ -63,24 +63,6 @@ export default function drawPie(chart, layer, s, index) {
 
       chart.highlightIndex = highlightIndex
       emitter.emit('highlightChange', highlightIndex)
-
-      let curEle = d3.select(this)
-      let otherPieItems = pieItems.filter((d, index) => index !== i)
-
-      if (highlightIndex === null) {
-        otherPieItems.transition()
-          .duration(defaultOptions.focusAniDuration)
-          .style('opacity', 1)
-
-      } else {
-        otherPieItems.transition()
-          .duration(defaultOptions.focusAniDuration)
-          .style('opacity', defaultOptions.highlightOtherOpacity)
-        curEle.transition()
-          .duration(defaultOptions.focusAniDuration)
-          .style('opacity', 1)
-      }
-
     })
     .on('mouseover', function (d, i) {
       if (!focusAnimation) return
@@ -134,6 +116,18 @@ export default function drawPie(chart, layer, s, index) {
   } else {
     pieItems.attr('d', d3arc)
   }
+
+  if (!isSet(s.clickHighlight) || s.clickHighlight) {
+    emitter.on('highlightChange', i => {
+      pieItems.each(function (d, idx) {
+        let targetOpacity = i !== null ? i === idx ? 1 : defaultOptions.highlightOtherOpacity : 1
+        d3.select(this).transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', targetOpacity)
+      })
+    })
+  }
+
 
   // draw label 
   if (s.label && isFunction(s.label.formatter)) {
