@@ -1,11 +1,11 @@
 import {
   isString,
-  delay
 } from "mytoolkit"
 
 export default function drawLegend(chart) {
   let {
     d3,
+    emitter,
     defaultOptions,
     containerWidth: cw,
     contianerHeight: ch,
@@ -62,6 +62,10 @@ export default function drawLegend(chart) {
         height
       }
     })
+    .on('click', (d, i) => {
+      chart.highlightIndex = i === chart.highlightIndex ? null : i
+      emitter.emit('highlightChange', chart.highlightIndex)
+    })
 
   // legend layout 
   let layoutX = legend.left + legend.padding
@@ -107,7 +111,6 @@ export default function drawLegend(chart) {
     })
   } else {
     let maxItemWidth = Math.max.apply(this, legendWraps.map(l => l.width))
-    console.log(maxItemWidth)
     legend.align === 'right' && (penX = layoutRight - maxItemWidth - legend.padding)
     for (let i = 0, l = legendWraps.length; i < l; i++) {
       let item = legendWraps[i]
@@ -116,6 +119,13 @@ export default function drawLegend(chart) {
     }
   }
 
+  emitter.on('highlightChange', i => {
+    legendWraps.forEach((l, k) => {
+      let targetOpacity = i !== null ? i == k ? 1 : defaultOptions.highlightOtherOpacity : 1
+      l.ele
+        .style('opacity', targetOpacity)
+    })
+  })
 
 
   function icon(d, i) {
