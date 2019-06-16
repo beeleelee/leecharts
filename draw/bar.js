@@ -133,69 +133,32 @@ export default function drawBar(chart, layer, s, index) {
             return stacked ? x - scaleValue(d[0]) : x - grid.left
           })
       }
-    })
-
-  return
-  let bars = layer.selectAll('rect.lc-bar')
-    .data(sData)
-    .join('rect.lc-bar')
-    .attrs({
-      x: (d, i) => {
-        if (orient === 'v') {
-          return stacked ? scaleValue(d[0]) : grid.left
-        }
-        return position(d, i, true) + barOffset
-      },
-      y: (d, i) => {
+      barRect.on('mouseover', function () {
         if (orient === 'h') {
-          return stacked ? scaleValue(d[0]) : ch - grid.bottom
+          barRect.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .ease(defaultOptions.enterAniEase)
+            .attr('transform', 'scale(1.2, 1)')
+        } else {
+          barRect.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .ease(defaultOptions.enterAniEase)
+            .attr('transform', 'scale(1, 1.2)')
         }
-        return position(d, i, false) + barOffset
-      },
-      width: function (d, i) {
+      }).on('mouseout', function () {
         if (orient === 'h') {
-          return barWidth
+          barRect.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .ease(defaultOptions.enterAniEase)
+            .attr('transform', 'scale(1)')
+        } else {
+          barRect.transition()
+            .duration(defaultOptions.focusAniDuration)
+            .ease(defaultOptions.enterAniEase)
+            .attr('transform', 'scale(1)')
         }
-
-        return 0
-      },
-      height: function (d, i) {
-        if (orient === 'v') {
-          return barWidth
-        }
-
-        return 0
-      },
-      stroke: 'none',
-      fill: barColor
+      })
     })
-
-  if (orient === 'h') {
-    bars.transition()
-      .duration(defaultOptions.enterAniDuration)
-      .ease(defaultOptions.enterAniEase)
-      .attr('height', function (d, i) {
-        let y = position(d, i, false)
-        return stacked ? scaleValue(d[0]) - y : ch - grid.bottom - y
-      })
-      .attrTween('y', function (d, i) {
-        let end = position(d, i, false)
-        let start = stacked ? scaleValue(d[0]) : ch - grid.bottom
-
-        return d3.interpolate(start, end)
-      })
-    bars.on('mouseover', function (d, i) {
-      //d3.select(this).attr('transform', `scale(1.1)`)
-    })
-  } else {
-    bars.transition()
-      .duration(defaultOptions.enterAniDuration)
-      .ease(defaultOptions.enterAniEase)
-      .attr('width', function (d, i) {
-        let x = position(d, i, true)
-        return stacked ? x - scaleValue(d[0]) : x - grid.left
-      })
-  }
 
 
   // let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
@@ -254,37 +217,37 @@ export default function drawBar(chart, layer, s, index) {
   // }
 
 
-  // layer.on('click', () => {
-  //   if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+  layer.on('click', () => {
+    if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
 
-  //   chart.highlightIndex = chart.highlightIndex === index ? null : index
-  //   emitter.emit('highlightChange', chart.highlightIndex)
-  // })
+    chart.highlightIndex = chart.highlightIndex === index ? null : index
+    emitter.emit('highlightChange', chart.highlightIndex)
+  })
 
-  // if (isUnset(s.highlightAnimation) || s.highlightAnimation) {
-  //   emitter.on('highlightChange', (ci) => {
-  //     if (ci === null || ci === index) {
-  //       layer.transition()
-  //         .duration(defaultOptions.focusAniDuration)
-  //         .style('opacity', 1)
+  if (isUnset(s.highlightAnimation) || s.highlightAnimation) {
+    emitter.on('highlightChange', (ci) => {
+      if (ci === null || ci === index) {
+        layer.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', 1)
 
-  //       if (currentPlotGroup) {
-  //         currentPlotGroup.transition()
-  //           .duration(defaultOptions.focusAniDuration)
-  //           .style('opacity', 1)
-  //       }
-  //     } else {
-  //       layer.transition()
-  //         .duration(defaultOptions.focusAniDuration)
-  //         .style('opacity', defaultOptions.highlightOtherOpacity)
-  //       if (currentPlotGroup) {
-  //         currentPlotGroup.transition()
-  //           .duration(defaultOptions.focusAniDuration)
-  //           .style('opacity', defaultOptions.highlightOtherOpacity)
-  //       }
-  //     }
-  //   })
-  // }
+        // if (currentPlotGroup) {
+        //   currentPlotGroup.transition()
+        //     .duration(defaultOptions.focusAniDuration)
+        //     .style('opacity', 1)
+        // }
+      } else {
+        layer.transition()
+          .duration(defaultOptions.focusAniDuration)
+          .style('opacity', defaultOptions.highlightOtherOpacity)
+        // if (currentPlotGroup) {
+        //   currentPlotGroup.transition()
+        //     .duration(defaultOptions.focusAniDuration)
+        //     .style('opacity', defaultOptions.highlightOtherOpacity)
+        // }
+      }
+    })
+  }
 
   function position(d, i, isX) {
     let td, scale
