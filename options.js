@@ -17,6 +17,9 @@ export default function options() {
     subtitle: {
       text: ''
     },
+    axisPointer: {
+      type: 'line',
+    },
     yAxis: {
       type: 'value',
       show: true,

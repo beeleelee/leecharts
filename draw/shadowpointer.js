@@ -2,7 +2,7 @@ import {
   getData
 } from '../utils'
 
-export default function drawLinePointer(chart, index) {
+export default function drawShadowPointer(chart, index) {
   let {
     d3,
     defaultOptions,
@@ -14,14 +14,14 @@ export default function drawLinePointer(chart, index) {
       xAxis,
       yAxis,
       grid,
-      axisPointer,
+      axisPointer
     },
     sections: {
-      linePointer,
+      shadowPointer,
     }
   } = chart
 
-  if (axisPointer !== 'line') return
+  if (axisPointer.type !== 'shadow') return
 
   let scaleCategory, scaleValue, orient
 
@@ -41,33 +41,34 @@ export default function drawLinePointer(chart, index) {
   let bandWidth = scaleCategory && scaleCategory.bandwidth ? scaleCategory.bandwidth() : 0
 
   if (index === null) {
-    linePointer
+    shadowPointer
       .style('opacity', 0)
   } else {
-    let x1, y1, x2, y2, cd
+    let x, y, width, height, cd
 
     if (orient === 'h') {
       cd = getData(xAxis.data, index)
-      x2 = x1 = scaleCategory(cd) + bandWidth * 0.5
-      y1 = grid.top
-      y2 = ch - grid.bottom
+      x = scaleCategory(cd)
+      y = grid.top
+      width = bandWidth
+      height = ch - grid.bottom - grid.top
     } else {
       cd = getData(yAxis.data, index)
-      y1 = y2 = scaleCategory(cd) + bandWidth * 0.5
-      x1 = grid.left
-      x2 = cw - grid.right
+      y = scaleCategory(cd)
+      x = grid.left
+      height = bandWidth
+      width = cw - grid.right
     }
 
-    linePointer
+    shadowPointer
       .style('opacity', 1)
       .attrs({
-        x1,
-        y1,
-        x2,
-        y2,
-        stroke: '#aaa',
-        'stroke-dasharray': defaultOptions.strokeDasharray,
-        opacity: 1
+        x,
+        y,
+        width,
+        height,
+        stroke: 'none',
+        fill: '#aaa'
       })
   }
 

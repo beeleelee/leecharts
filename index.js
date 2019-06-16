@@ -21,6 +21,7 @@ import drawPie from './draw/pie'
 import drawLinePointer from './draw/linepointer'
 import drawLegend from './draw/legend'
 import emitter from './emitter'
+import drawShadowPointer from './draw/shadowpointer';
 
 d3Augment(d3)
 
@@ -157,8 +158,6 @@ class chart {
   }
   calculateBarOffset() {
     let {
-      defaultOptions,
-      d3,
       options: {
         series
       },
@@ -169,14 +168,12 @@ class chart {
     let barSeries = series.filter(s => s.type === 'bar')
     if (!barSeries.length) return
 
-    let scaleCategory, bandWidth, orient
+    let scaleCategory, bandWidth
 
     if (scaleX.bandwidth) {
       scaleCategory = scaleX
-      orient = 'h'
     } else if (scaleY.bandwidth) {
       scaleCategory = scaleY
-      orient = 'v'
     } else {
       // to do: dealing with charts without category for both xAxis and yAxis
       return
@@ -267,10 +264,9 @@ class chart {
 
     this.sections.axisY = this.paper.append('g.lc-axis-y')
 
-    this.sections.shadowPointer = this.paper.append('rect.lc-shadow-pointer')
-
     this.sections.scrollXView = this.paper.append('g.lc-scroll-x-view')
     this.sections.axisX = this.sections.scrollXView.append('g.lc-axis-x')
+    this.sections.shadowPointer = this.sections.scrollXView.append('rect.lc-shadow-pointer')
     this.sections.series = this.sections.scrollXView.append('g.lc-series')
     this.sections.linePointer = this.sections.scrollXView.append('line.lc-line-pointer')
     this.sections.plotGroup = this.sections.scrollXView.append('g.lc-plot-group')
@@ -284,6 +280,7 @@ class chart {
 
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
+      drawShadowPointer(this, ...args)
     })
   }
   __onMousemove() {
