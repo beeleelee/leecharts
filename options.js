@@ -19,6 +19,7 @@ export default function options() {
     },
     axisPointer: {
       type: 'line',
+      color: '#ddd'
     },
     yAxis: {
       type: 'value',
@@ -133,3 +134,5 @@ options.legendIcon = (type) => {
 options.barStyle = {
 
 }
+
+options.shadowPointerColor = 'rgba(125,125,125, 0.6)'

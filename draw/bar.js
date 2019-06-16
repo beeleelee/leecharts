@@ -4,6 +4,9 @@ import {
   extend,
   randStr,
 } from 'mytoolkit'
+import {
+  getData
+} from '../utils'
 import drawGradient from './gradient'
 
 export default function drawBar(chart, layer, s, index) {
@@ -26,7 +29,7 @@ export default function drawBar(chart, layer, s, index) {
     scaleY,
     scaleX,
   } = chart
-  console.log(s)
+
   let scaleCategory, scaleValue, orient, barWidth, barOffset
   barWidth = s._barWidth
   barOffset = s._barOffset
@@ -57,6 +60,82 @@ export default function drawBar(chart, layer, s, index) {
   let barStyle = extend({}, defaultOptions.barStyle, s.barStyle || {})
   let barColor = drawGradient(chart, (barStyle.color || null), defaultOptions.getColor(index))
 
+  let barWrap = layer.selectAll('g.lc-bar-wrap')
+    .data(sData)
+    .join('g.lc-bar-wrap')
+    .each(function (d, i) {
+      let bar = d3.select(this)
+      let x, y, y1, x1, width, height
+      if (stacked) {
+        if (orient === 'h') {
+          x = scaleCategory(getData(xAxis.data, i)) + barOffset + barWidth * 0.5
+          y = scaleValue(d[1])
+          y1 = scaleValue(d[0])
+          width = barWidth
+          height = y1 - y
+          bar.attr('transform', `translate(${x}, ${y + height * 0.5})`)
+        } else {
+          x = scaleValue(d[1])
+          y = scaleCategory(getData(yAxis.data, i)) + barOffset + barWidth * 0.5
+          x1 = scaleValue(d[0])
+          width = x - x1
+          height = barWidth
+          bar.attr('transform', `translate(${x - width * 0.5}, ${y})`)
+        }
+      } else {
+        if (orient === 'h') {
+          x = scaleCategory(getData(xAxis.data, i)) + barOffset + barWidth * 0.5
+          y = scaleValue(d)
+          y1 = ch - grid.bottom
+          width = barWidth
+          height = y1 - y
+          bar.attr('transform', `translate(${x}, ${y + height * 0.5})`)
+        } else {
+          x = scaleValue(d)
+          y = scaleCategory(getData(yAxis.data, i)) + barOffset + barWidth * 0.5
+          x1 = grid.left
+          width = x - x1
+          height = barWidth
+          bar.attr('transform', `translate(${x - width * 0.5}, ${y})`)
+        }
+      }
+
+      let barRect = bar.safeSelect('rect')
+        .attrs({
+          x: () => {
+            return width * -0.5
+          },
+          y: () => {
+            return orient === 'h' ? height * 0.5 : height * -0.5
+          },
+          width: () => {
+            return orient === 'h' ? width : 0
+          },
+          height: () => {
+            return orient === 'v' ? height : 0
+          },
+          stroke: 'none',
+          fill: barColor
+        })
+      if (orient === 'h') {
+        barRect.transition()
+          .duration(defaultOptions.enterAniDuration)
+          .ease(defaultOptions.enterAniEase)
+          .attr('height', height)
+          .attr('y', -0.5 * height)
+
+      } else {
+        barRect.transition()
+          .duration(defaultOptions.enterAniDuration)
+          .ease(defaultOptions.enterAniEase)
+          .attr('width', function (d, i) {
+            let x = position(d, i, true)
+            return stacked ? x - scaleValue(d[0]) : x - grid.left
+          })
+      }
+    })
+
+  return
   let bars = layer.selectAll('rect.lc-bar')
     .data(sData)
     .join('rect.lc-bar')
@@ -105,6 +184,9 @@ export default function drawBar(chart, layer, s, index) {
 
         return d3.interpolate(start, end)
       })
+    bars.on('mouseover', function (d, i) {
+      //d3.select(this).attr('transform', `scale(1.1)`)
+    })
   } else {
     bars.transition()
       .duration(defaultOptions.enterAniDuration)

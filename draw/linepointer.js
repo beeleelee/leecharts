@@ -21,7 +21,7 @@ export default function drawLinePointer(chart, index) {
     }
   } = chart
 
-  if (axisPointer !== 'line') return
+  if (axisPointer.type !== 'line') return
 
   let scaleCategory, scaleValue, orient
 

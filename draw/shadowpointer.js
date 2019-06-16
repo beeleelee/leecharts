@@ -1,6 +1,7 @@
 import {
   getData
 } from '../utils'
+import drawGradient from './gradient'
 
 export default function drawShadowPointer(chart, index) {
   let {
@@ -23,8 +24,8 @@ export default function drawShadowPointer(chart, index) {
 
   if (axisPointer.type !== 'shadow') return
 
-  let scaleCategory, scaleValue, orient
-
+  let scaleCategory, scaleValue, orient, color
+  color = drawGradient(chart, axisPointer.color, defaultOptions.shadowPointerColor)
   if (scaleX.bandwidth) {
     scaleCategory = scaleX
     scaleValue = scaleY
@@ -68,7 +69,7 @@ export default function drawShadowPointer(chart, index) {
         width,
         height,
         stroke: 'none',
-        fill: '#aaa'
+        fill: color
       })
   }
 
