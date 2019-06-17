@@ -68,6 +68,9 @@ export default function drawBar(chart, layer, s, index) {
       let bar = d3.select(this)
       let x, y, y1, x1, width, height
 
+      let barTween = bar.transition()
+        .duration(chart.firstRender ? 0 : tDuration)
+        .ease(defaultOptions.enterAniEase)
       if (stacked) {
         if (orient === 'h') {
           x = scaleCategory(getData(xAxis.data, i)) + barOffset + barWidth * 0.5
@@ -75,14 +78,14 @@ export default function drawBar(chart, layer, s, index) {
           y1 = scaleValue(d[0])
           width = barWidth
           height = y1 - y
-          bar.attr('transform', `translate(${x}, ${y + height * 0.5})`)
+          barTween.attr('transform', `translate(${x}, ${y + height * 0.5})`)
         } else {
           x = scaleValue(d[1])
           y = scaleCategory(getData(yAxis.data, i)) + barOffset + barWidth * 0.5
           x1 = scaleValue(d[0])
           width = x - x1
           height = barWidth
-          bar.attr('transform', `translate(${x - width * 0.5}, ${y})`)
+          barTween.attr('transform', `translate(${x - width * 0.5}, ${y})`)
         }
       } else {
         if (orient === 'h') {
@@ -91,14 +94,14 @@ export default function drawBar(chart, layer, s, index) {
           y1 = ch - grid.bottom
           width = barWidth
           height = y1 - y
-          bar.attr('transform', `translate(${x}, ${y + height * 0.5})`)
+          barTween.attr('transform', `translate(${x}, ${y + height * 0.5})`)
         } else {
           x = scaleValue(d)
           y = scaleCategory(getData(yAxis.data, i)) + barOffset + barWidth * 0.5
           x1 = grid.left
           width = x - x1
           height = barWidth
-          bar.attr('transform', `translate(${x - width * 0.5}, ${y})`)
+          barTween.attr('transform', `translate(${x - width * 0.5}, ${y})`)
         }
       }
 

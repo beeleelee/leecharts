@@ -35,6 +35,7 @@ class chart {
     this.emitter = new emitter()
     this.container = d3.select(selector)
     this.options = deepExtend(defaultOptions(), options)
+    this.preOptions = null
     this.previousOptions = null
     this.sections = {}
     this.maxValue = 0
@@ -45,7 +46,7 @@ class chart {
     let showTooltip = this.__showTooltip.bind(this)
     this.__showTooltip = debounce(showTooltip, 20)
     this.init()
-    this.drawChart()
+    options && this.drawChart()
 
   }
   drawChart() {
@@ -240,6 +241,17 @@ class chart {
     })
     this.maxValue = maxValue
     this.maxValueFixed = false
+  }
+  setOptions(options) {
+    if (!options) return
+
+    this.preOptions = this.options
+    this.options = deepExtend(defaultOptions(), options)
+
+    this.figureGeometry()
+    this.calculateStackData()
+    this.calculateMaxValue()
+    this.drawChart()
   }
   init() {
     if (!this.container) return

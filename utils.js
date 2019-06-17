@@ -23,7 +23,7 @@ export function isInBound(bound, x, y) {
   return true
 }
 
-export function deepExtend(source, target) {
+export function deepExtend(source, target = {}) {
   Object.keys(target).forEach(tk => {
     if (isObject(source[tk]) && isObject(target[tk])) {
       deepExtend(source[tk], target[tk])

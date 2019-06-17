@@ -36,7 +36,9 @@ export default function drawTooltip(chart, opts) {
       let data = series.filter(s => s.type === 'bar' || s.type === 'line').map(s => {
         return {
           name: s.name,
-          data: s.data[opts.activeIndex]
+          data: s.data[opts.activeIndex],
+          value: getData(s.data, opts.activeIndex),
+          dataIndex: opts.activeIndex
         }
       })
       tooltip.styles({
