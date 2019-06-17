@@ -43,7 +43,7 @@ class chart {
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)
     let showTooltip = this.__showTooltip.bind(this)
-    this.__showTooltip = debounce(showTooltip, 100)
+    this.__showTooltip = debounce(showTooltip, 50)
     this.init()
     this.drawChart()
 
@@ -299,7 +299,7 @@ class chart {
 
   }
   __showTooltip(...args) {
-    console.log(args)
+    drawTooltip(this, ...args)
   }
   __onMousemove() {
     let {

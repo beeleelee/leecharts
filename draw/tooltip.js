@@ -26,21 +26,20 @@ export default function drawTooltip(chart, opts) {
     if (opts.activeIndex === null) {
       tooltip.styles({
         opacity: 0,
-        top: "-99999px",
-        left: "-99999px"
+        display: 'none'
       })
       hide = true
     } else {
       tooltip.styles({
-        opacity: 1,
-        top: `${opts.event.pageY + 20}px`,
-        left: `${opts.event.pageX + 20}px`
+        display: 'block',
+
       })
-      console.log(cw, ch, e.offsetX, e.offsetY, e.pageX, e.pageY)
+
     }
   }
   if (hide) return
 
+  let threshold = 10, x = e.pageX, y = e.pageY, padding = 15
   let {
     width: ttWidth,
     height: ttHeight,
@@ -48,5 +47,21 @@ export default function drawTooltip(chart, opts) {
   let remainWidth, remainHeight
   remainWidth = cw - e.offsetX
   remainHeight = ch - e.offsetY
-  console.log(ttWidth, ttHeight, remainWidth, remainHeight)
+  if (remainWidth + threshold < ttWidth) {
+    x -= (ttWidth + padding)
+  } else {
+    x += padding
+  }
+  if (remainHeight + threshold < ttHeight) {
+    y -= (ttHeight + padding)
+  } else {
+    y += padding
+  }
+  tooltip
+    .transition()
+    .duration(defaultOptions.focusAniDuration)
+    .ease(defaultOptions.enterAniEase)
+    .style('opacity', 1)
+    .style('top', y + 'px')
+    .style('left', x + 'px')
 }
