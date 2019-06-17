@@ -21,7 +21,8 @@ import drawPie from './draw/pie'
 import drawLinePointer from './draw/linepointer'
 import drawLegend from './draw/legend'
 import emitter from './emitter'
-import drawShadowPointer from './draw/shadowpointer';
+import drawShadowPointer from './draw/shadowpointer'
+import drawTooltip from './draw/tooltip'
 
 d3Augment(d3)
 
@@ -41,6 +42,8 @@ class chart {
 
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)
+    let showTooltip = this.__showTooltip.bind(this)
+    this.__showTooltip = debounce(showTooltip, 100)
     this.init()
     this.drawChart()
 
@@ -276,12 +279,27 @@ class chart {
     this.sections.title = this.paper.append('text.lc-title')
     this.sections.subtitle = this.paper.append('text.lc-subtitle')
 
-    this.sections.tooltip = this.paper.append('g.lc-tooltip')
+    this.sections.tooltip = d3.select(document.body).safeSelect('div.lc-tooltip')
+    this.sections.tooltip.styles({
+      position: 'absolute',
+      left: '-999999px',
+      top: '-9999999px',
+      opacity: 0,
+      'background-color': 'rgba(0,0,0,.3)',
+      width: '200px',
+      height: '80px'
+    }).text('tool tip')
 
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
       drawShadowPointer(this, ...args)
     })
+
+    this.emitter.on('showTooltip', this.__showTooltip)
+
+  }
+  __showTooltip(...args) {
+    console.log(args)
   }
   __onMousemove() {
     let {
@@ -333,10 +351,19 @@ class chart {
         this.activeCategroryIndex = i
         emitter.emit('axisChange', i)
       }
+      emitter.emit('showTooltip', {
+        type: 'axisPointer',
+        activeIndex: i,
+        event: d3.event
+      })
     } else {
       if (activeCategroryIndex !== null) {
         this.activeCategroryIndex = null
         emitter.emit('axisChange', null)
+        emitter.emit('showTooltip', {
+          type: 'axisPointer',
+          activeIndex: null
+        })
       }
     }
   }

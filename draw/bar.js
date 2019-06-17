@@ -123,6 +123,12 @@ export default function drawBar(chart, layer, s, index) {
           .ease(defaultOptions.enterAniEase)
           .attr('height', height)
           .attr('y', -0.5 * height)
+          .on('start', function () {
+            d3.select(this).attr('tweening', 1)
+          })
+          .on('end', function () {
+            d3.select(this).attr('tweening', null)
+          })
 
       } else {
         barRect.transition()
@@ -132,8 +138,16 @@ export default function drawBar(chart, layer, s, index) {
             let x = position(d, i, true)
             return stacked ? x - scaleValue(d[0]) : x - grid.left
           })
+          .on('start', function () {
+            barRect.attr('tweening', 1)
+          })
+          .on('end', function () {
+            barRect.attr('tweening', null)
+          })
       }
       barRect.on('mouseover', function () {
+        if (barRect.attr('tweening') == '1') return
+
         if (orient === 'h') {
           barRect.transition()
             .duration(defaultOptions.focusAniDuration)
@@ -146,6 +160,8 @@ export default function drawBar(chart, layer, s, index) {
             .attr('transform', 'scale(1, 1.2)')
         }
       }).on('mouseout', function () {
+        if (barRect.attr('tweening') == '1') return
+
         if (orient === 'h') {
           barRect.transition()
             .duration(defaultOptions.focusAniDuration)
