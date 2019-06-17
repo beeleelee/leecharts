@@ -2,7 +2,8 @@
   "name": "leecharts",
   "version": "0.0.2",
   "description": "basic charts build on d3",
-  "main": "dist/leecharts.cjs.js",
+  "main": "index.js",
+  "cjs": "dist/leecharts.cjs.js",
   "module": "dist/leecharts.esm.js",
   "browser": "dist/leecharts.umd.js",
   "scripts": {
