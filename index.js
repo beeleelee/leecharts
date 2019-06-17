@@ -246,7 +246,7 @@ class chart {
     if (!options) return
 
     this.preOptions = this.options
-    this.options = deepExtend(defaultOptions(), options)
+    this.options = deepExtend(this.preOptions, options)
 
     this.figureGeometry()
     this.calculateStackData()
