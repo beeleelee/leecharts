@@ -42,6 +42,30 @@ export function getBoundingRect(doc) {
 }
 
 export function d3Augment(d3) {
+  if (!d3.transition.prototype.attrs) {
+    let attrs = function (name) {
+      if (isObject(name)) {
+        Object.keys(name).forEach(k => {
+          this.attr(k, name[k])
+        })
+      }
+      return this
+    }
+    d3.transition.prototype.attrs = attrs
+  }
+
+  if (!d3.transition.prototype.styles) {
+    let styles = function (name) {
+      if (isObject(name)) {
+        Object.keys(name).forEach(k => {
+          this.style(k, name[k])
+        })
+      }
+      return this
+    }
+    d3.transition.prototype.styles = styles
+  }
+
   if (!d3.selection.prototype.attrs) {
     let attrs = function (name) {
       if (isObject(name)) {

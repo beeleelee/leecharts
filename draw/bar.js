@@ -59,6 +59,7 @@ export default function drawBar(chart, layer, s, index) {
 
   let barStyle = extend({}, defaultOptions.barStyle, s.barStyle || {})
   let barColor = drawGradient(chart, (barStyle.color || null), defaultOptions.getColor(index))
+  let tDuration = 500
 
   let barWrap = layer.selectAll('g.lc-bar-wrap')
     .data(sData)
@@ -66,6 +67,7 @@ export default function drawBar(chart, layer, s, index) {
     .each(function (d, i) {
       let bar = d3.select(this)
       let x, y, y1, x1, width, height
+
       if (stacked) {
         if (orient === 'h') {
           x = scaleCategory(getData(xAxis.data, i)) + barOffset + barWidth * 0.5
@@ -101,26 +103,37 @@ export default function drawBar(chart, layer, s, index) {
       }
 
       let barRect = bar.safeSelect('rect')
-        .attrs({
-          x: () => {
-            return width * -0.5
-          },
-          y: () => {
-            return orient === 'h' ? height * 0.5 : height * -0.5
-          },
-          width: () => {
-            return orient === 'h' ? width : 0
-          },
-          height: () => {
-            return orient === 'v' ? height : 0
-          },
-          stroke: 'none',
-          fill: barColor
-        })
+
+      let barRectTween = barRect.transition()
+        .duration(chart.firstRender ? defaultOptions.enterAniDuration : tDuration)
+        .ease(defaultOptions.enterAniEase)
+
+      barRect.attrs({
+        x: () => {
+          return width * -0.5
+        },
+        // y: () => {
+        //   return orient === 'h' ? height * 0.5 : height * -0.5
+        // },
+        // width: function () {
+        //   return orient === 'h' ? width : preBarWidth
+        // },
+        // height: function () {
+        //   return orient === 'v' ? height : preBarHeight
+        // },
+        stroke: 'none',
+        fill: barColor
+      })
       if (orient === 'h') {
-        barRect.transition()
-          .duration(defaultOptions.enterAniDuration)
-          .ease(defaultOptions.enterAniEase)
+        if (chart.firstRender) {
+          barRect.attrs({
+            y: height * 0.5,
+            width,
+            height: 0
+          })
+        }
+        barRectTween
+          .attr('width', width)
           .attr('height', height)
           .attr('y', -0.5 * height)
           .on('start', function () {
@@ -131,9 +144,15 @@ export default function drawBar(chart, layer, s, index) {
           })
 
       } else {
-        barRect.transition()
-          .duration(defaultOptions.enterAniDuration)
-          .ease(defaultOptions.enterAniEase)
+        if (chart.firstRender) {
+          barRect.attrs({
+            y: height * -0.5,
+            width: 0,
+            height
+          })
+        }
+        barRectTween
+          .attr('height', height)
           .attr('width', function (d, i) {
             let x = position(d, i, true)
             return stacked ? x - scaleValue(d[0]) : x - grid.left
