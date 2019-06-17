@@ -1,25 +1,28 @@
 import {
   getData
 } from '../utils'
+import {
+  isFunction,
+} from 'mytoolkit'
 
 export default function drawTooltip(chart, opts) {
   let {
     d3,
     defaultOptions,
-    scaleX,
-    scaleY,
     containerHeight: ch,
     containerWidth: cw,
     options: {
-      xAxis,
-      yAxis,
-      grid,
-      axisPointer,
+      series,
+      tooltip: tooltipOpts
     },
     sections: {
       tooltip,
     }
   } = chart
+  if (!tooltipOpts || tooltipOpts.show === false) return
+  if (!isFunction(tooltipOpts.formatter)) return // only support function type formatter 
+
+  let formatter = tooltipOpts.formatter
   let e = opts.event || {}
   let hide = false
   if (opts.type === 'axisPointer') {
@@ -30,15 +33,22 @@ export default function drawTooltip(chart, opts) {
       })
       hide = true
     } else {
+      let data = series.filter(s => s.type === 'bar' || s.type === 'line').map(s => {
+        return {
+          name: s.name,
+          data: s.data[opts.activeIndex]
+        }
+      })
       tooltip.styles({
         display: 'block',
 
-      })
+      }).html(formatter(data))
 
     }
   }
   if (hide) return
 
+  // dealing with tooltip position
   let threshold = 10, x = e.pageX, y = e.pageY, padding = 15
   let {
     width: ttWidth,
