@@ -1,14 +1,8 @@
 {
   "name": "leecharts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "basic charts build on d3",
   "main": "index.js",
-  "cjs": "dist/leecharts.cjs.js",
-  "module": "dist/leecharts.esm.js",
-  "browser": "dist/leecharts.umd.js",
-  "scripts": {
-    "build": "rollup -c"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/beeleelee/leecharts.git"
@@ -22,36 +16,5 @@
   "bugs": {
     "url": "https://github.com/beeleelee/leecharts/issues"
   },
-  "homepage": "https://github.com/beeleelee/leecharts#readme",
-  "dependencies": {
-    "d3": "^5.9.2",
-    "mytoolkit": "^1.2.19"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.6",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/preset-env": "^7.1.6",
-    "@babel/preset-react": "^7.0.0",
-    "ava": "1.0.0-rc.2",
-    "babel-eslint": "^10.0.1",
-    "cssnano": "^4.1.7",
-    "eslint": "^5.9.0",
-    "eslint-plugin-react": "^7.11.1",
-    "parcel-bundler": "^1.10.3",
-    "postcss-cssnext": "^3.1.0",
-    "postcss-easy-import": "^3.0.0",
-    "postcss-import": "^12.0.1",
-    "postcss-nested": "^4.1.0",
-    "postcss-preset-env": "^6.4.0",
-    "postcss-simple-vars": "^5.0.1",
-    "react-router-dom": "^4.3.1",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.67.3",
-    "rollup-plugin-babel": "^4.0.3",
-    "rollup-plugin-commonjs": "^9.2.0",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-postcss": "^1.6.3",
-    "rollup-plugin-uglify": "^6.0.0"
-  }
+  "homepage": "https://github.com/beeleelee/leecharts#readme"
 }
