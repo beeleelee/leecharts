@@ -1,6 +1,8 @@
 import {
   isSet,
   isFunction,
+  decodeJSON,
+  encodeJSON
 } from 'mytoolkit'
 import {
   parsePercent
@@ -102,7 +104,7 @@ export default function drawPie(chart, layer, s, index) {
         })
 
     })
-  if (!isSet(s.enterAnimation) || s.enterAnimation) {
+  if (chart.firstRender && (!isSet(s.enterAnimation) || s.enterAnimation)) {
     pieItems
       .transition()
       .duration(defaultOptions.enterAniDuration)
@@ -113,8 +115,26 @@ export default function drawPie(chart, layer, s, index) {
           return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
         }
       })
+      .on('end', function (d, i) {
+        d3.select(this).attr('prevData', encodeJSON(d))
+      })
   } else {
-    pieItems.attr('d', d3arc)
+    //pieItems.attr('d', d3arc)
+    pieItems.transition()
+      .duration(defaultOptions.focusAniDuration)
+      .ease(defaultOptions.enterAniEase)
+      .attrTween('d', function (d, i) {
+        let ele = d3.select(this)
+        let prevData = decodeJSON(ele.attr('prevData')) || d
+        let interStart = d3.interpolate(prevData.startAngle, d.startAngle)
+        let interEnd = d3.interpolate(prevData.endAngle, d.endAngle)
+        return t => {
+          return d3arc({ startAngle: interStart(t), endAngle: interEnd(t) })
+        }
+      })
+      .on('end', function (d, i) {
+        d3.select(this).attr('prevData', encodeJSON(d))
+      })
   }
 
   if (!isSet(s.clickHighlight) || s.clickHighlight) {
