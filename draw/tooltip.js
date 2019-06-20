@@ -25,9 +25,11 @@ export default function drawTooltip(chart, opts) {
   let formatter = tooltipOpts.formatter
   let e = opts.event || {}
   let hide = false
+  let tooltipStyles = tooltipOpts.styles || {}
   if (opts.type === 'axisPointer') {
     if (opts.activeIndex === null) {
       tooltip.styles({
+        ...tooltipStyles,
         opacity: 0,
         display: 'none'
       })

@@ -297,10 +297,7 @@ class chart {
       left: '-999999px',
       top: '-9999999px',
       opacity: 0,
-      'background-color': 'rgba(0,0,0,.3)',
-      width: '200px',
-      height: '80px'
-    }).text('tool tip')
+    })
 
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
