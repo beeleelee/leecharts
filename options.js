@@ -93,6 +93,7 @@ options.focusRate = 1.1
 options.focusPieEase = easeBounce
 options.enterAniDuration = 2000
 options.enterAniEase = easeSinInOut
+options.changeAniDuraiton = 800
 
 options.tickNumber = 5
 options.axisLineColor = '#ddd'

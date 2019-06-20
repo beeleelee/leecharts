@@ -1,8 +1,11 @@
 import {
   isSet,
   isUnset,
+  isArray,
   extend,
   randStr,
+  encodeJSON,
+  decodeJSON,
 } from 'mytoolkit'
 import drawGradient from './gradient'
 
@@ -83,9 +86,51 @@ export default function drawLine(chart, layer, s, index) {
     let areaColor = areaStyle.color || null
     areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
 
-    layer.safeSelect('path.lc-area')
-      .attr('d', area(sData))
+    let areaEle = layer.safeSelect('path.lc-area')
+      //.attr('d', area(sData))
       .attrs({ stroke: 'none', fill: areaColor })
+    if (chart.firstRender) {
+      areaEle.attr('d', area(sData))
+        .attr('prevData', encodeJSON(sData))
+    } else {
+      areaEle.transition()
+        .duration(defaultOptions.changeAniDuraiton)
+        .ease(defaultOptions.enterAniEase)
+        .attrTween('d', function () {
+          let ele = d3.select(this)
+          let prevData = decodeJSON(ele.attr('prevData'))
+
+          return t => {
+            let interData = sData.map((p, i) => {
+              let start0, end0, pd, inter0, inter1, start1, end1
+              pd = prevData[i] || p
+              if (isArray(p)) {
+                start0 = isArray(pd) ? pd[0] : pd
+                end0 = p[0]
+                inter0 = start0 + (end0 - start0) * t
+                start1 = isArray(pd) ? pd[1] : pd
+                end1 = p[1]
+                inter1 = start1 + (end1 - start1) * t
+
+                return [inter0, inter1]
+              } else {
+                start1 = isArray(pd) ? pd[1] : pd
+                end1 = p
+                inter1 = start1 + (end1 - start1) * t
+
+                return inter1
+              }
+
+            })
+
+            return area(interData)
+          }
+        })
+        .on('end', function () {
+          d3.select(this).attr('prevData', encodeJSON(sData))
+        })
+    }
+
   }
 
   if (lineStyle.show) {
@@ -95,9 +140,38 @@ export default function drawLine(chart, layer, s, index) {
       .defined((d) => !!d)
     lineStyle.curve && line.curve(d3.curveCardinal)
 
-    layer.safeSelect('path.lc-line')
-      .attr('d', line(sData))
+    let lineEle = layer.safeSelect('path.lc-line')
       .attrs({ stroke: color, fill: 'none' })
+
+    if (chart.firstRender) {
+      lineEle.attr('d', line(sData))
+        .attr('prevData', encodeJSON(sData))
+    } else {
+      lineEle.transition()
+        .duration(defaultOptions.changeAniDuraiton)
+        .ease(defaultOptions.enterAniEase)
+        .attrTween('d', function () {
+          let ele = d3.select(this)
+          let prevData = decodeJSON(ele.attr('prevData'))
+
+          return t => {
+            let interData = sData.map((p, i) => {
+              let start, end, pd, inter
+              end = stacked ? p[1] : p
+              pd = prevData[i] || p
+              start = isArray(pd) ? pd[1] : pd
+              inter = start + (end - start) * t
+
+              return isArray(p) ? [p[0], inter] : inter
+            })
+
+            return line(interData)
+          }
+        })
+        .on('end', function () {
+          d3.select(this).attr('prevData', encodeJSON(sData))
+        })
+    }
   }
 
   let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
@@ -113,10 +187,11 @@ export default function drawLine(chart, layer, s, index) {
       chart.highlightIndex = chart.highlightIndex === index ? null : index
       emitter.emit('highlightChange', chart.highlightIndex)
     })
-    currentPlotGroup.selectAll('g.lc-node-wrap')
+    let plots = currentPlotGroup.selectAll('g.lc-node-wrap')
       .data(sData)
       .join('g.lc-node-wrap')
-      .attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+    plots
+      //.attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
       .each(function (d, i) {
         let wrap = d3.select(this)
 
@@ -142,7 +217,16 @@ export default function drawLine(chart, layer, s, index) {
               seriesData: s
             })
           })
+        if (!chart.firstRender) {
+          wrap.transition()
+            .duration(defaultOptions.changeAniDuraiton)
+            .ease(defaultOptions.enterAniEase)
+            .attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+        } else {
+          wrap.attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+        }
       })
+
     emitter.on('axisChange', (i) => {
       let n = currentPlotGroup.selectAll(`.lc-active-node`)
       !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
