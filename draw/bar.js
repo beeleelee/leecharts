@@ -198,9 +198,10 @@ export default function drawBar(chart, layer, s, index) {
       })
 
       let labelStyle = extend({}, s.labelStyle || {})
-      let label, padding
+      let label, padding, textStyle
       if (labelStyle.show) {
         padding = labelStyle.padding || 10
+        textStyle = labelStyle.textStyle || {}
         label = bar.safeSelect('text.lc-bar-label')
 
         label
@@ -213,10 +214,14 @@ export default function drawBar(chart, layer, s, index) {
             },
             y: () => {
               return orient === 'h' ? -0.5 * height - padding : barWidth
-            }
+            },
+            fill: textStyle.color || '#000'
           })
           .text(function () {
             return stacked ? d[1] : d
+          })
+          .styles({
+            ...textStyle
           })
 
       }
