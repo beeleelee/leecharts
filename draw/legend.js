@@ -1,5 +1,6 @@
 import {
   isString,
+  isFunction,
 } from "mytoolkit"
 
 export default function drawLegend(chart) {
@@ -47,12 +48,13 @@ export default function drawLegend(chart) {
     .join('g.lc-legend-item-wrap')
     .each(function (d, i) {
       let ele = d3.select(this)
-      let html = '', x = iconSize + 6
+      let html = '', x = iconSize + 6, formatter
+      formatter = isFunction(d.formatter) ? d.formatter : () => d.name
       html += icon(d, i)
       if (d.icon === 'lineCircle') {
         x = iconSize * 1.8 + 6
       }
-      html += `<text x=${x} y=${fontSize} style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${d.name}</text>`
+      html += `<text x=${x} y=${fontSize} style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${formatter()}</text>`
       ele.html(html)
 
       let { width, height } = ele.node().getBBox()
