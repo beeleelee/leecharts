@@ -26,10 +26,12 @@ export default function drawTooltip(chart, opts) {
   let e = opts.event || {}
   let hide = false
   let tooltipStyles = tooltipOpts.styles || {}
+
+  tooltip.styles({ ...tooltipStyles })
+
   if (opts.type === 'axisPointer') {
     if (opts.activeIndex === null) {
       tooltip.styles({
-        ...tooltipStyles,
         opacity: 0,
         display: 'none'
       })
@@ -48,6 +50,19 @@ export default function drawTooltip(chart, opts) {
 
       }).html(formatter(data))
 
+    }
+  } else if (opts.type === 'item') {
+    if (opts.data === null) {
+      tooltip.styles({
+        opacity: 0,
+        display: 'none'
+      })
+      hide = true
+    } else {
+      tooltip.styles({
+        display: 'block',
+
+      }).html(formatter(opts.data))
     }
   }
   if (hide) return

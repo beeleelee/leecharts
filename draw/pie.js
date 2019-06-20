@@ -104,6 +104,14 @@ export default function drawPie(chart, layer, s, index) {
         })
 
     })
+    .on('mousemove', function (d, i) {
+      emitter.emit('showTooltip', {
+        type: 'item',
+        dataIndex: i,
+        data: d,
+        event: d3.event
+      })
+    })
   if (chart.firstRender && (!isSet(s.enterAnimation) || s.enterAnimation)) {
     pieItems
       .transition()
