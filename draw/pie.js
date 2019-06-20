@@ -1,5 +1,6 @@
 import {
   isSet,
+  isObject,
   isFunction,
   decodeJSON,
   encodeJSON
@@ -103,8 +104,16 @@ export default function drawPie(chart, layer, s, index) {
           }
         })
 
+      if (isObject(s.tooltip) && !s.tooltip.show) return
+
+      emitter.emit('showTooltip', {
+        type: 'item',
+        data: null,
+      })
     })
     .on('mousemove', function (d, i) {
+      if (isObject(s.tooltip) && !s.tooltip.show) return
+
       emitter.emit('showTooltip', {
         type: 'item',
         dataIndex: i,
