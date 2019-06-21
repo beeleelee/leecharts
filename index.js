@@ -23,6 +23,7 @@ import drawLegend from './draw/legend'
 import emitter from './emitter'
 import drawShadowPointer from './draw/shadowpointer'
 import drawTooltip from './draw/tooltip'
+import drawPoint from './draw/point'
 
 d3Augment(d3)
 
@@ -89,6 +90,10 @@ class chart {
             break
           case 'pie':
             drawPie(chart, layer, s, i)
+            break
+          case 'point':
+            drawPoint(chart, layer, s, i)
+            break
           default:
         }
 
