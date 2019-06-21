@@ -24,6 +24,7 @@ import emitter from './emitter'
 import drawShadowPointer from './draw/shadowpointer'
 import drawTooltip from './draw/tooltip'
 import drawPoint from './draw/point'
+import drawCustom from './draw/custom'
 
 d3Augment(d3)
 
@@ -93,6 +94,9 @@ class chart {
             break
           case 'point':
             drawPoint(chart, layer, s, i)
+            break
+          case 'custom':
+            drawCustom(chart, layer, s, i)
             break
           default:
         }
