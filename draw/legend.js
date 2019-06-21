@@ -61,11 +61,15 @@ export default function drawLegend(chart) {
       legendWraps[i] = {
         ele,
         width,
-        height
+        height,
+        highlightIndex: d.highlightIndex
       }
     })
     .on('click', (d, i) => {
-      chart.highlightIndex = i === chart.highlightIndex ? null : i
+      if (d.triggerHighlight === false) return
+
+      let dataIndex = d.highlightIndex || i
+      chart.highlightIndex = dataIndex === chart.highlightIndex ? null : dataIndex
       emitter.emit('highlightChange', chart.highlightIndex)
     })
 
@@ -123,7 +127,8 @@ export default function drawLegend(chart) {
 
   emitter.on('highlightChange', i => {
     legendWraps.forEach((l, k) => {
-      let targetOpacity = i !== null ? i == k ? 1 : defaultOptions.highlightOtherOpacity : 1
+      let dataIndex = l.highlightIndex || k
+      let targetOpacity = i !== null ? i == dataIndex ? 1 : defaultOptions.highlightOtherOpacity : 1
       l.ele
         .style('opacity', targetOpacity)
     })
