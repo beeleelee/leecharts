@@ -70,25 +70,14 @@ export default function drawPoint(chart, layer, s, index) {
   plots
     .each(function (d, i) {
       let wrap = d3.select(this)
-      let node
+      let node = wrap.safeSelect('g.lc-custom-shape-g')
       if (isFunction(customShape)) {
         let htmlString = customShape({ bandWidth })
-        wrap.html(htmlString)
+        node.html(htmlString)
       } else {
-        wrap.html('<circle r="5" />')
+        node.html('<circle r="5" />')
       }
-      // node = wrap.safeSelect('circle.lc-node')
 
-
-      // node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
-      //   .on('click', () => {
-      //     // emitter.emit('clickItem', {
-      //     //   value: d,
-      //     //   seriesIndex: index,
-      //     //   dataIndex: i,
-      //     //   seriesData: s
-      //     // })
-      //   })
       if (!chart.firstRender) {
         wrap.transition()
           .duration(defaultOptions.changeAniDuraiton)
@@ -99,16 +88,16 @@ export default function drawPoint(chart, layer, s, index) {
       }
     })
 
-  // emitter.on('axisChange', (i) => {
-  //   let n = currentPlotGroup.selectAll(`.lc-active-node`)
-  //   !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
-  //   if (i !== null) {
-  //     currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
-  //       .classed('lc-active-node', true)
-  //       .transition().duration(defaultOptions.focusAniDuration)
-  //       .attr('r', r * 1.5)
-  //   }
-  // })
+  emitter.on('axisChange', (i) => {
+    let n = currentPlotGroup.selectAll(`.lc-active-node`)
+    !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('transform', 'scale(1)')
+    if (i !== null) {
+      currentPlotGroup.selectAll('.lc-custom-shape-g').filter((d, idx) => isSet(d) && i === idx)
+        .classed('lc-active-node', true)
+        .transition().duration(defaultOptions.focusAniDuration)
+        .attr('transform', 'scale(1.2)')
+    }
+  })
 
   // ini clip path animation 
   let clipPath, clipPathId, clipRect
