@@ -6,8 +6,8 @@ import {
   randStr,
   encodeJSON,
   decodeJSON,
+  isFunction,
 } from 'mytoolkit'
-import drawGradient from './gradient'
 
 export default function drawPoint(chart, layer, s, index) {
   let {
@@ -51,193 +51,65 @@ export default function drawPoint(chart, layer, s, index) {
   let rData = s.data || []
   let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
-  let stacked = false
-  if (s.stackData) {
-    stacked = true
-    sData = s.stackData
-  }
-
-  let areaStyle = extend({}, defaultOptions.areaStyle, s.areaStyle || {})
-  if (areaStyle.show) {
-    let area = d3.area()
-      .x((d, i) => position(d, i, true))
-      .y((d, i) => position(d, i, false))
-      .defined((d) => !!d)
-    lineStyle.curve && area.curve(d3.curveCardinal)
-
-    if (orient === 'h') {
-      area.y1((d, i) => {
-        if (stacked) {
-
-          return scaleValue(d[0])
-        } else {
-          return ch - grid.bottom
-        }
-      })
-    } else {
-      area.x1((d, i) => {
-        if (stacked) {
-          return scaleValue(d[0])
-        } else {
-          return grid.left
-        }
-      })
-    }
-    let areaColor = areaStyle.color || null
-    areaColor = drawGradient(chart, areaColor, defaultOptions.getAreaColor(index))
-
-    let areaEle = layer.safeSelect('path.lc-area')
-      //.attr('d', area(sData))
-      .attrs({ stroke: 'none', fill: areaColor })
-    if (chart.firstRender) {
-      areaEle.attr('d', area(sData))
-        .attr('prevData', encodeJSON(sData))
-    } else {
-      areaEle.transition()
-        .duration(defaultOptions.changeAniDuraiton)
-        .ease(defaultOptions.enterAniEase)
-        .attrTween('d', function () {
-          let ele = d3.select(this)
-          let prevData = decodeJSON(ele.attr('prevData'))
-
-          return t => {
-            let interData = sData.map((p, i) => {
-              let start0, end0, pd, inter0, inter1, start1, end1
-              pd = prevData[i] || p
-              if (isArray(p)) {
-                start0 = isArray(pd) ? pd[0] : pd
-                end0 = p[0]
-                inter0 = start0 + (end0 - start0) * t
-                start1 = isArray(pd) ? pd[1] : pd
-                end1 = p[1]
-                inter1 = start1 + (end1 - start1) * t
-
-                return [inter0, inter1]
-              } else {
-                start1 = isArray(pd) ? pd[1] : pd
-                end1 = p
-                inter1 = start1 + (end1 - start1) * t
-
-                return inter1
-              }
-
-            })
-
-            return area(interData)
-          }
-        })
-        .on('end', function () {
-          d3.select(this).attr('prevData', encodeJSON(sData))
-        })
-    }
-
-  }
-
-  if (lineStyle.show) {
-    let line = d3.line()
-      .x((d, i) => position(d, i, true))
-      .y((d, i) => position(d, i, false))
-      .defined((d) => !!d)
-    lineStyle.curve && line.curve(d3.curveCardinal)
-
-    let lineEle = layer.safeSelect('path.lc-line')
-      .attrs({ stroke: color, fill: 'none' })
-
-    if (chart.firstRender) {
-      lineEle.attr('d', line(sData))
-        .attr('prevData', encodeJSON(sData))
-    } else {
-      lineEle.transition()
-        .duration(defaultOptions.changeAniDuraiton)
-        .ease(defaultOptions.enterAniEase)
-        .attrTween('d', function () {
-          let ele = d3.select(this)
-          let prevData = decodeJSON(ele.attr('prevData'))
-
-          return t => {
-            let interData = sData.map((p, i) => {
-              let start, end, pd, inter
-              end = stacked ? p[1] : p
-              pd = prevData[i] || p
-              start = isArray(pd) ? pd[1] : pd
-              inter = start + (end - start) * t
-
-              return isArray(p) ? [p[0], inter] : inter
-            })
-
-            return line(interData)
-          }
-        })
-        .on('end', function () {
-          d3.select(this).attr('prevData', encodeJSON(sData))
-        })
-    }
-  }
-
-  let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
+  let customShape = s.customShape
   let currentPlotGroup
-  if (plotStyle.show) {
-    currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
-    let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
-    let r = plotSetting.size / 2
 
-    currentPlotGroup.on('click', () => {
-      if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+  currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
+  let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
+  let r = plotSetting.size / 2
 
-      chart.highlightIndex = chart.highlightIndex === index ? null : index
-      emitter.emit('highlightChange', chart.highlightIndex)
-    })
-    let plots = currentPlotGroup.selectAll('g.lc-node-wrap')
-      .data(sData)
-      .join('g.lc-node-wrap')
-    plots
-      //.attr('transform', (d, i) => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
-      .each(function (d, i) {
-        let wrap = d3.select(this)
+  currentPlotGroup.on('click', () => {
+    if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
 
-        let bgCircle = wrap.safeSelect('circle.lc-bgcircle')
-          .attrs({ r: r * 3, stroke: 'none', fill: color, opacity: 0 })
+    chart.highlightIndex = chart.highlightIndex === index ? null : index
+    emitter.emit('highlightChange', chart.highlightIndex)
+  })
+  let plots = currentPlotGroup.selectAll('g.lc-node-wrap')
+    .data(sData)
+    .join('g.lc-node-wrap')
+  plots
+    .each(function (d, i) {
+      let wrap = d3.select(this)
+      let node
+      if (isFunction(customShape)) {
+        let htmlString = customShape({ bandWidth })
+        wrap.html(htmlString)
+      } else {
+        wrap.html('<circle r="5" />')
+      }
+      // node = wrap.safeSelect('circle.lc-node')
 
 
-        let node = wrap.safeSelect('circle.lc-node')
-        node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
-          .on('mouseover', () => {
-            bgCircle
-              .attr('opacity', defaultOptions.bgCircleOpacity)
-          })
-          .on('mouseout', () => {
-            bgCircle
-              .attr('opacity', 0)
-          })
-          .on('click', () => {
-            emitter.emit('clickItem', {
-              value: stacked ? rData[i] : d,
-              seriesIndex: index,
-              dataIndex: i,
-              seriesData: s
-            })
-          })
-        if (!chart.firstRender) {
-          wrap.transition()
-            .duration(defaultOptions.changeAniDuraiton)
-            .ease(defaultOptions.enterAniEase)
-            .attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
-        } else {
-          wrap.attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
-        }
-      })
-
-    emitter.on('axisChange', (i) => {
-      let n = currentPlotGroup.selectAll(`.lc-active-node`)
-      !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
-      if (i !== null) {
-        currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
-          .classed('lc-active-node', true)
-          .transition().duration(defaultOptions.focusAniDuration)
-          .attr('r', r * 1.5)
+      // node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
+      //   .on('click', () => {
+      //     // emitter.emit('clickItem', {
+      //     //   value: d,
+      //     //   seriesIndex: index,
+      //     //   dataIndex: i,
+      //     //   seriesData: s
+      //     // })
+      //   })
+      if (!chart.firstRender) {
+        wrap.transition()
+          .duration(defaultOptions.changeAniDuraiton)
+          .ease(defaultOptions.enterAniEase)
+          .attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
+      } else {
+        wrap.attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
       }
     })
-  }
+
+  // emitter.on('axisChange', (i) => {
+  //   let n = currentPlotGroup.selectAll(`.lc-active-node`)
+  //   !n.empty() && n.classed('lc-active-node', false).transition().duration(defaultOptions.focusAniDuration).attr('r', r)
+  //   if (i !== null) {
+  //     currentPlotGroup.selectAll('.lc-node').filter((d, idx) => isSet(d) && i === idx)
+  //       .classed('lc-active-node', true)
+  //       .transition().duration(defaultOptions.focusAniDuration)
+  //       .attr('r', r * 1.5)
+  //   }
+  // })
+
   // ini clip path animation 
   let clipPath, clipPathId, clipRect
   if (chart.firstRender) {
@@ -326,7 +198,7 @@ export default function drawPoint(chart, layer, s, index) {
         bw = bandWidth
       } else {
         scale = scaleValue
-        td = stacked ? d[1] : d
+        td = d
         bw = 0
       }
     } else {
@@ -336,7 +208,7 @@ export default function drawPoint(chart, layer, s, index) {
         bw = bandWidth
       } else {
         scale = scaleValue
-        td = stacked ? d[1] : d
+        td = d
         bw = 0
       }
     }
