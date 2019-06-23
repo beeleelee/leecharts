@@ -18,6 +18,9 @@ export default function drawPie(chart, layer, s, index) {
     containerWidth: cw,
     containerHeight: ch,
     containerCenter: cc,
+    options: {
+      onClick: clickHandle
+    },
   } = chart
   let data = s.data
   if (!data || !data.length) return
@@ -51,6 +54,16 @@ export default function drawPie(chart, layer, s, index) {
           seriesIndex: index,
           dataIndex: i,
           seriesData: s
+        })
+      }
+      if (isFunction(clickHandle)) {
+        clickHandle({
+          type: 'itemClicked',
+          data: d,
+          dataIndex: i,
+          series: s,
+          seriesIndex: index,
+          seriesData: s.data
         })
       }
 
