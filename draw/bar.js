@@ -3,6 +3,7 @@ import {
   isUnset,
   extend,
   randStr,
+  isFunction,
 } from 'mytoolkit'
 import {
   getData
@@ -20,6 +21,7 @@ export default function drawBar(chart, layer, s, index) {
       grid,
       xAxis,
       yAxis,
+      onClick: clickHandle
     },
     sections: {
       defs,
@@ -194,6 +196,17 @@ export default function drawBar(chart, layer, s, index) {
             .duration(defaultOptions.focusAniDuration)
             .ease(defaultOptions.enterAniEase)
             .attr('transform', 'scale(1)')
+        }
+      }).on('click', function () {
+        if (isFunction(clickHandle)) {
+          clickHandle({
+            type: 'itemClicked',
+            data: stacked ? d[1] - d[0] : d,
+            dataIndex: i,
+            seriesIndex: index,
+            seriesData: s.data,
+            series: s
+          })
         }
       })
 

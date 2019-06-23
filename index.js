@@ -11,6 +11,7 @@ import {
   isSet,
   debounce,
   groupBy,
+  isFunction,
 } from 'mytoolkit'
 
 import drawAxisX from './draw/axisX'
@@ -311,6 +312,9 @@ class chart {
     this.emitter.on('axisChange', (...args) => {
       drawLinePointer(this, ...args)
       drawShadowPointer(this, ...args)
+      if (isFunction(this.options.onAxisChange)) {
+        this.options.onAxisChange(...args)
+      }
     })
 
     this.emitter.on('showTooltip', this.__showTooltip)
