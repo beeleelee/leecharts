@@ -6,6 +6,7 @@ import {
   randStr,
   encodeJSON,
   decodeJSON,
+  isFunction,
 } from 'mytoolkit'
 import drawGradient from './gradient'
 
@@ -20,6 +21,7 @@ export default function drawLine(chart, layer, s, index) {
       grid,
       xAxis,
       yAxis,
+      onClick: clickHandle,
     },
     sections: {
       defs,
@@ -225,6 +227,18 @@ export default function drawLine(chart, layer, s, index) {
         } else {
           wrap.attr('transform', () => `translate(${position(d, i, true)}, ${position(d, i, false)})`)
         }
+        wrap.on('click', function () {
+          if (isFunction(clickHandle)) {
+            clickHandle({
+              type: 'itemClicked',
+              data: stacked ? d[1] - d[0] : d,
+              dataIndex: i,
+              seriesIndex: index,
+              series: s,
+              seriesData: s.data
+            })
+          }
+        })
       })
 
     emitter.on('axisChange', (i) => {
