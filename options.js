@@ -133,7 +133,7 @@ options.legendIcon = (type) => {
 }
 
 options.barStyle = {
-
+  barMaxWidth: 80
 }
 
 options.shadowPointerColor = 'rgba(125,125,125, 0.6)'

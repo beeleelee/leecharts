@@ -233,7 +233,7 @@ class chart {
           break
         }
         barMinWidth = b.barMinWidth || 0
-        barMaxWidth = b.barMaxWidth || expectedBarWidth
+        barMaxWidth = Math.min(b.barMaxWidth || expectedBarWidth, defaultOptions.barStyle.barMaxWidth)
         barWidth = Math.min(Math.max(barMinWidth, expectedBarWidth), barMaxWidth)
         cache.push(barWidth)
         groupIdx++
