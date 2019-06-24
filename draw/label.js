@@ -28,10 +28,12 @@ export default function drawLabel(chart, layer, opts, i) {
 
   let { width, height } = layer.node().getBBox()
 
-  if (align === 'left') {
-    layer.attr('transform', `translate(${left}, ${top})`)
-  } else {
+  if (align === 'middle') {
+    layer.attr('transform', `translate(${(cw + left - right - width) / 2},${top})`)
+  } else if (align == 'right') {
     layer.attr('transform', `translate(${cw - right - width},${top})`)
+  } else {
+    layer.attr('transform', `translate(${left}, ${top})`)
   }
 
 
