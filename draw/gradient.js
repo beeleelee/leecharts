@@ -33,10 +33,10 @@ export default function drawGradient(chart, color, defaultColor) {
       defs.append('linearGradient')
         .attrs({
           id,
-          x1: color.x || 0,
-          x2: color.x2 || 0,
-          y1: color.y || 0,
-          y2: color.y2 || 1
+          x1: isUnset(color.x) ? 0 : color.x1,
+          x2: isUnset(color.x2) ? 0 : color.x2,
+          y1: isUnset(color.y) ? 0 : color.y1,
+          y2: isUnset(color.y2) ? 1 : color.y2
         }).html(r)
       gradientPool.push({
         id,
