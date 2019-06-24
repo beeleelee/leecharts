@@ -12,6 +12,7 @@ import {
   debounce,
   groupBy,
   isFunction,
+  isObject,
 } from 'mytoolkit'
 
 import drawAxisX from './draw/axisX'
@@ -26,6 +27,7 @@ import drawShadowPointer from './draw/shadowpointer'
 import drawTooltip from './draw/tooltip'
 import drawPoint from './draw/point'
 import drawCustom from './draw/custom'
+import drawLabel from './draw/label'
 
 d3Augment(d3)
 
@@ -59,7 +61,33 @@ class chart {
     this.calculateBarOffset()
     this.drawSeries()
     drawLegend(this)
+    this.drawLabel()
     this.firstRender = false
+  }
+  drawLabel() {
+    let chart = this
+    let {
+      options: {
+        label = []
+      },
+      sections: {
+        labels: labelGroup
+      }
+    } = chart
+    if (isObject(label)) {
+      label = [label]
+    }
+    if (label.length === 0) {
+      return
+    }
+    labelGroup.selectAll('g.lc-label-g')
+      .data(label)
+      .join('g.lc-label-g')
+      .each(function (d, i) {
+        let layer = d3.select(this)
+          .classed(`lc-label-g-${i}`, true)
+        drawLabel(chart, layer, d, i)
+      })
   }
   drawSeries() {
     let chart = this
