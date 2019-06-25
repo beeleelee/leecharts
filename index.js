@@ -6,6 +6,7 @@ import {
   d3Augment,
   deepExtend,
   isInBound,
+  maybePercentValue,
 } from './utils'
 import {
   isSet,

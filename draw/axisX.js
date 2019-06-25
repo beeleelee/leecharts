@@ -3,6 +3,9 @@ import {
   extend,
   addComma,
 } from 'mytoolkit'
+import {
+  maybePercentValue,
+} from '../utils'
 
 export default function axisX(chart) {
   let {
@@ -31,11 +34,16 @@ export default function axisX(chart) {
     axisX.html('')
     return
   }
-  let scaleX, domainData, max, tickNumber, tickIncrement, tickValues, category
+  let scaleX, domainData, max, tickNumber, tickIncrement, tickValues, category, gridLeft, gridRight, gridTop, gridBottom
+
+  gridLeft = maybePercentValue(grid.left, cw)
+  gridRight = maybePercentValue(grid.right, cw)
+  gridTop = maybePercentValue(grid.top, ch)
+  gridBottom = maybePercentValue(grid.bottom, ch)
 
   if (xAxis.type !== 'value') {
     domainData = xAxis.data.map(item => item && item.value ? item.value : item)
-    scaleX = d3.scaleBand().domain(domainData).range([grid.left, cw - grid.right])
+    scaleX = d3.scaleBand().domain(domainData).range([gridLeft, cw - gridRight])
     tickValues = domainData
     category = true
   } else {
@@ -47,7 +55,7 @@ export default function axisX(chart) {
     }
     scaleX = d3.scaleLinear()
       .domain([0, max])
-      .range([grid.left, cw - grid.right])
+      .range([gridLeft, cw - gridRight])
 
     tickValues = d3.ticks(0, max, tickNumber)
     category = false
@@ -55,7 +63,7 @@ export default function axisX(chart) {
 
   chart.xAxisTickValues = tickValues
   chart.scaleX = scaleX
-  axisX.attr('transform', `translate(0, ${ch - grid.bottom})`)
+  axisX.attr('transform', `translate(0, ${ch - gridBottom})`)
 
   let lineColor = xAxis.lineColor || defaultOptions.axisLineColor, tickSize = xAxis.tickSize || defaultOptions.axisTickSize
 
@@ -121,7 +129,7 @@ export default function axisX(chart) {
       stroke: sls.color,
       'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
       x1: d => scaleX(d),
-      y2: -(ch - grid.bottom - grid.top),
+      y2: -(ch - gridBottom - gridTop),
       x2: d => scaleX(d)
     })
 }

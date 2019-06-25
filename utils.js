@@ -1,10 +1,22 @@
 import {
   isObject,
+  isUnset,
 } from 'mytoolkit'
 
 export function getData(arr, index) {
   let item = arr[index]
   return item && item.value ? item.value : item
+}
+
+export function maybePercentValue(value, target) {
+  if (/^\d+(\.\d+)?%$/.test(value)) {
+    if (isUnset(target)) {
+      target = 1
+    }
+
+    return parsePercent(value) * target
+  }
+  return value
 }
 
 export function parsePercent(p) {
