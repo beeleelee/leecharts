@@ -32,7 +32,12 @@ export default function drawPie(chart, layer, s, index) {
   let radius = s.radius || [0, 0.7]
   let innerRadius = Math.min(cw, ch) * parsePercent(radius[0]) * 0.5
   let outerRadius = Math.min(cw, ch) * parsePercent(radius[1]) * 0.5
-  let arcs = d3.pie()(data.map(item => item.value))
+  let arcs = d3.pie()
+  if (!s.sort) {
+    arcs.sortValues(null)
+  }
+  arcs = arcs(data.map(item => item.value))
+
   let d3arc = d3.arc()
     .outerRadius(outerRadius)
     .innerRadius(innerRadius)

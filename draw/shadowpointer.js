@@ -61,7 +61,7 @@ export default function drawShadowPointer(chart, index) {
       y = scaleCategory(cd)
       x = gridLeft
       height = bandWidth
-      width = cw - gridRight
+      width = cw - gridRight - gridLeft
     }
 
     shadowPointer

@@ -59,6 +59,12 @@ export default function options() {
 }
 
 let colors = [
+  '#5665FF',
+  '#569CFF',
+  '#8AF0F8',
+  '#FF7C49',
+  '#CA8DF7',
+  '#D2488A',
   '#7cb5ec',
   '#434348',
   '#90ed7d',
