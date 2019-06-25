@@ -26,8 +26,9 @@ export default function drawLinePointer(chart, index) {
 
   if (axisPointer.type !== 'line') return
 
-  let scaleCategory, scaleValue, orient
+  let scaleCategory, scaleValue, orient, color
 
+  color = axisPointer.color || '#aaa'
   if (scaleX.bandwidth) {
     scaleCategory = scaleX
     scaleValue = scaleY
@@ -68,7 +69,7 @@ export default function drawLinePointer(chart, index) {
         y1,
         x2,
         y2,
-        stroke: '#aaa',
+        stroke: color,
         'stroke-dasharray': defaultOptions.strokeDasharray,
         opacity: 1
       })
