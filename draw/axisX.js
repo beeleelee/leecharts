@@ -14,7 +14,6 @@ export default function axisX(chart) {
     containerWidth: cw,
     containerHeight: ch,
     options: {
-      grid,
       series,
       xAxis
     },
@@ -23,6 +22,10 @@ export default function axisX(chart) {
     },
     maxValue,
     maxValueFixed,
+    gridLeft,
+    gridRight,
+    gridTop,
+    gridBottom,
   } = chart
   let showAxis = true
   if (!xAxis.show) showAxis = false
@@ -34,12 +37,7 @@ export default function axisX(chart) {
     axisX.html('')
     return
   }
-  let scaleX, domainData, max, tickNumber, tickIncrement, tickValues, category, gridLeft, gridRight, gridTop, gridBottom
-
-  gridLeft = maybePercentValue(grid.left, cw)
-  gridRight = maybePercentValue(grid.right, cw)
-  gridTop = maybePercentValue(grid.top, ch)
-  gridBottom = maybePercentValue(grid.bottom, ch)
+  let scaleX, domainData, max, tickNumber, tickIncrement, tickValues, category
 
   if (xAxis.type !== 'value') {
     domainData = xAxis.data.map(item => item && item.value ? item.value : item)

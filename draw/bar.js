@@ -19,7 +19,6 @@ export default function drawBar(chart, layer, s, index) {
     containerWidth: cw,
     containerHeight: ch,
     options: {
-      grid,
       xAxis,
       yAxis,
       onClick: clickHandle
@@ -31,15 +30,16 @@ export default function drawBar(chart, layer, s, index) {
     },
     scaleY,
     scaleX,
+    gridLeft,
+    gridRight,
+    gridTop,
+    gridBottom,
   } = chart
 
-  let scaleCategory, scaleValue, orient, barWidth, barOffset, gridLeft, gridRight, gridTop, gridBottom
+  let scaleCategory, scaleValue, orient, barWidth, barOffset
   barWidth = s._barWidth
   barOffset = s._barOffset
-  gridLeft = maybePercentValue(grid.left, cw)
-  gridRight = maybePercentValue(grid.right, cw)
-  gridTop = maybePercentValue(grid.top, ch)
-  gridBottom = maybePercentValue(grid.bottom, ch)
+
 
   if (scaleX.bandwidth) {
     scaleCategory = scaleX

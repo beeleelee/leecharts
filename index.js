@@ -372,13 +372,14 @@ class chart {
     let {
       containerWidth: cw,
       containerHeight: ch,
-      options: {
-        grid
-      },
       emitter,
       scaleX,
       scaleY,
       activeCategroryIndex,
+      gridLeft,
+      gridRight,
+      gridBottom,
+      gridTop,
     } = this
     if (!scaleX || !scaleY) return
 
@@ -397,12 +398,6 @@ class chart {
       offsetX: x,
       offsetY: y,
     } = d3.event
-    let gridLeft, gridRight, gridTop, gridBottom
-
-    gridLeft = maybePercentValue(grid.left, cw)
-    gridRight = maybePercentValue(grid.right, cw)
-    gridTop = maybePercentValue(grid.top, ch)
-    gridBottom = maybePercentValue(grid.bottom, ch)
 
     let gridBound = [[gridLeft, gridTop], [cw - gridRight, ch - gridBottom]]
     let bandWidth = scaleCategory.bandwidth()

@@ -30,6 +30,10 @@ export default function drawLine(chart, layer, s, index) {
     },
     scaleY,
     scaleX,
+    gridLeft,
+    gridRight,
+    gridTop,
+    gridBottom,
   } = chart
   let lineStyle = extend({}, defaultOptions.lineStyle, (s.lineStyle || {}))
   let color = lineStyle.color || defaultOptions.getColor(index)
@@ -73,7 +77,7 @@ export default function drawLine(chart, layer, s, index) {
 
           return scaleValue(d[0])
         } else {
-          return ch - grid.bottom
+          return ch - gridBottom
         }
       })
     } else {
@@ -81,7 +85,7 @@ export default function drawLine(chart, layer, s, index) {
         if (stacked) {
           return scaleValue(d[0])
         } else {
-          return grid.left
+          return gridLeft
         }
       })
     }
