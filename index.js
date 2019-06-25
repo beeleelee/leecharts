@@ -46,6 +46,7 @@ class chart {
     this.sections = {}
     this.maxValue = 0
     this.firstRender = true
+    this.maybePercentValue = maybePercentValue
 
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)
@@ -55,8 +56,23 @@ class chart {
     options && this.drawChart()
 
   }
+  setGrid() {
+    let {
+      containerWidth: cw,
+      containerHeight: ch,
+      options: {
+        grid
+      },
+    } = this
+
+    this.gridLeft = maybePercentValue(grid.left, cw)
+    this.gridRight = maybePercentValue(grid.right, cw)
+    this.gridTop = maybePercentValue(grid.top, ch)
+    this.gridBottom = maybePercentValue(grid.bottom, ch)
+  }
   drawChart() {
     this.emitter.clear('highlightChange')
+    this.setGrid()
     drawAxisX(this)
     drawAxisY(this)
     this.calculateBarOffset()
