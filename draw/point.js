@@ -17,7 +17,6 @@ export default function drawPoint(chart, layer, s, index) {
     containerWidth: cw,
     containerHeight: ch,
     options: {
-      grid,
       xAxis,
       yAxis,
     },

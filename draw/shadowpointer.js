@@ -14,12 +14,15 @@ export default function drawShadowPointer(chart, index) {
     options: {
       xAxis,
       yAxis,
-      grid,
       axisPointer
     },
     sections: {
       shadowPointer,
-    }
+    },
+    gridLeft,
+    gridRight,
+    gridTop,
+    gridBottom,
   } = chart
 
   if (axisPointer.type !== 'shadow') return
@@ -50,15 +53,15 @@ export default function drawShadowPointer(chart, index) {
     if (orient === 'h') {
       cd = getData(xAxis.data, index)
       x = scaleCategory(cd)
-      y = grid.top
+      y = gridTop
       width = bandWidth
-      height = ch - grid.bottom - grid.top
+      height = ch - gridBottom - gridTop
     } else {
       cd = getData(yAxis.data, index)
       y = scaleCategory(cd)
-      x = grid.left
+      x = gridLeft
       height = bandWidth
-      width = cw - grid.right
+      width = cw - gridRight
     }
 
     shadowPointer

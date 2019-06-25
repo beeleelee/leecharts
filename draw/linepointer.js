@@ -13,12 +13,15 @@ export default function drawLinePointer(chart, index) {
     options: {
       xAxis,
       yAxis,
-      grid,
       axisPointer,
     },
     sections: {
       linePointer,
-    }
+    },
+    gridLeft,
+    gridRight,
+    gridTop,
+    gridBottom,
   } = chart
 
   if (axisPointer.type !== 'line') return
@@ -49,13 +52,13 @@ export default function drawLinePointer(chart, index) {
     if (orient === 'h') {
       cd = getData(xAxis.data, index)
       x2 = x1 = scaleCategory(cd) + bandWidth * 0.5
-      y1 = grid.top
-      y2 = ch - grid.bottom
+      y1 = gridTop
+      y2 = ch - gridBottom
     } else {
       cd = getData(yAxis.data, index)
       y1 = y2 = scaleCategory(cd) + bandWidth * 0.5
-      x1 = grid.left
-      x2 = cw - grid.right
+      x1 = gridLeft
+      x2 = cw - gridRight
     }
 
     linePointer
