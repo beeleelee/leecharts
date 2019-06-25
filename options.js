@@ -99,6 +99,7 @@ options.changeAniDuraiton = 800
 options.tickNumber = 5
 options.axisLineColor = '#ddd'
 options.axisTickSize = 6
+options.axisTickColor = '#ddd'
 options.axisLabel = {
   fontSize: 12,
   color: '#aaa',
@@ -134,7 +135,7 @@ options.legendIcon = (type) => {
 }
 
 options.barStyle = {
-  barMaxWidth: 80
+  barMaxWidth: 60
 }
 
 options.shadowPointerColor = 'rgba(125,125,125, 0.6)'

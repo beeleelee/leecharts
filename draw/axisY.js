@@ -3,9 +3,6 @@ import {
   extend,
   addComma,
 } from 'mytoolkit'
-import {
-  maybePercentValue,
-} from '../utils'
 
 export default function axisY(chart) {
   let {
@@ -14,7 +11,6 @@ export default function axisY(chart) {
     containerWidth: cw,
     containerHeight: ch,
     options: {
-      grid,
       series,
       yAxis
     },
@@ -29,7 +25,7 @@ export default function axisY(chart) {
     gridBottom,
   } = chart
   let showAxis = true
-  if (!yAxis.show) showAxis = false
+
   if (series.length === 0) showAxis = false
   // draw axis only when series contains line or bar
   if (series.filter(s => s.type === 'line' || s.type === 'bar').length === 0) showAxis = false
@@ -64,71 +60,80 @@ export default function axisY(chart) {
   chart.scaleY = scaleY
   axisY.attr('transform', `translate(${gridLeft}, 0)`)
 
-  let lineColor = yAxis.lineColor || defaultOptions.axisLineColor, tickSize = yAxis.tickSize || defaultOptions.axisTickSize
+  let lineColor = yAxis.lineColor || defaultOptions.axisLineColor
+  let tickSize = yAxis.tickSize || defaultOptions.axisTickSize
+  let tickColor = yAxis.tickColor || defaultOptions.axisTickColor
 
-  // axis bar 
-  axisY.safeSelect('line.domain')
-    .attrs({
-      fill: 'none',
-      stroke: lineColor,
-      y1: scaleY.range()[1],
-      y2: scaleY.range()[0],
-    })
-  // axis ticks 
-  axisY.selectAll('line.lc-axis-tick')
-    .data(tickValues)
-    .join('line.lc-axis-tick')
-    .attrs({
-      fill: 'none',
-      stroke: lineColor,
-      x1: yAxis.tickInside ? tickSize : -tickSize,
-      y1: d => scaleY(d),
-      y2: d => scaleY(d)
-    })
-  let axisLabelSetting = extend({}, defaultOptions.axisLabel, yAxis.axisLabel || {})
-  // axis label
-  let labelPadding = axisLabelSetting.padding + (yAxis.tickInside ? 0 : tickSize)
-
-  let labelgroup = axisY.selectAll('g.lc-axis-label-g')
-    .data(tickValues)
-    .join('g.lc-axis-label-g')
-    .attr('transform', d => `translate(${-labelPadding}, ${(category ? scaleY.bandwidth() * 0.5 : 0) + scaleY(d) + axisLabelSetting.fontSize / 3})`)
-
-  labelgroup.each(function (d, i) {
-    d3.select(this)
-      .safeSelect('text')
-      .text(d => {
-        if (isFunction(axisLabelSetting.formatter)) {
-          return axisLabelSetting.formatter(d)
-        }
-        return addComma(d)
-      })
+  if (yAxis.show) {
+    // axis bar 
+    axisY.safeSelect('line.domain')
       .attrs({
-        'text-anchor': 'end',
-        stroke: 'none',
-        fill: axisLabelSetting.color,
-        transform: `rotate(${axisLabelSetting.rotate})`
+        fill: 'none',
+        stroke: lineColor,
+        y1: scaleY.range()[1],
+        y2: scaleY.range()[0],
       })
-      .styles({
-        'font-size': axisLabelSetting.fontSize
+
+    // axis ticks 
+    axisY.selectAll('line.lc-axis-tick')
+      .data(tickValues)
+      .join('line.lc-axis-tick')
+      .attrs({
+        fill: 'none',
+        stroke: tickColor,
+        x1: yAxis.tickInside ? tickSize : -tickSize,
+        y1: d => scaleY(d),
+        y2: d => scaleY(d)
       })
-  })
+    let axisLabelSetting = extend({}, defaultOptions.axisLabel, yAxis.axisLabel || {})
+    // axis label
+    let labelPadding = axisLabelSetting.padding + (yAxis.tickInside ? 0 : tickSize)
 
-  // split lines 
-  let sls = yAxis.splitLine
-  if (!sls.show) return
+    let labelgroup = axisY.selectAll('g.lc-axis-label-g')
+      .data(tickValues)
+      .join('g.lc-axis-label-g')
+      .attr('transform', d => `translate(${-labelPadding}, ${(category ? scaleY.bandwidth() * 0.5 : 0) + scaleY(d) + axisLabelSetting.fontSize / 3})`)
 
-
-  let splitLines = axisY.safeSelect('g.lc-split-lines')
-  splitLines.selectAll('line')
-    .data(tickValues.filter(v => v !== 0))
-    .join('line')
-    .attrs({
-      fill: 'none',
-      stroke: sls.color,
-      'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
-      y1: d => scaleY(d),
-      x2: cw - gridRight - gridLeft,
-      y2: d => scaleY(d)
+    labelgroup.each(function (d, i) {
+      d3.select(this)
+        .safeSelect('text')
+        .text(d => {
+          if (isFunction(axisLabelSetting.formatter)) {
+            return axisLabelSetting.formatter(d)
+          }
+          return addComma(d)
+        })
+        .attrs({
+          'text-anchor': 'end',
+          stroke: 'none',
+          fill: axisLabelSetting.color,
+          transform: `rotate(${axisLabelSetting.rotate})`
+        })
+        .styles({
+          'font-size': axisLabelSetting.fontSize
+        })
     })
+
+    // split lines 
+    let sls = yAxis.splitLine
+
+    let splitLines = axisY.safeSelect('g.lc-split-lines')
+    if (sls.show) {
+      splitLines.selectAll('line')
+        .data(tickValues.filter(v => v !== 0))
+        .join('line')
+        .attrs({
+          fill: 'none',
+          stroke: sls.color,
+          'stroke-dasharray': sls.type === 'dashed' ? defaultOptions.strokeDasharray : 'none',
+          y1: d => scaleY(d),
+          x2: cw - gridRight - gridLeft,
+          y2: d => scaleY(d)
+        })
+    } else {
+      splitLines.html('')
+    }
+  } else {
+    axisY.html('')
+  }
 }
