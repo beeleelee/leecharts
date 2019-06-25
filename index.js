@@ -381,8 +381,14 @@ class chart {
       offsetX: x,
       offsetY: y,
     } = d3.event
+    let gridLeft, gridRight, gridTop, gridBottom
 
-    let gridBound = [[grid.left, grid.top], [cw - grid.right, ch - grid.bottom]]
+    gridLeft = maybePercentValue(grid.left, cw)
+    gridRight = maybePercentValue(grid.right, cw)
+    gridTop = maybePercentValue(grid.top, ch)
+    gridBottom = maybePercentValue(grid.bottom, ch)
+
+    let gridBound = [[gridLeft, gridTop], [cw - gridRight, ch - gridBottom]]
     let bandWidth = scaleCategory.bandwidth()
 
     if (isInBound(gridBound, x, y)) {
@@ -390,9 +396,9 @@ class chart {
       scaleRange = scaleCategory.range()
       l = Math.round(Math.abs(scaleRange[0] - scaleRange[1]) / bandWidth)
       if (orient === 'h') {
-        i = Math.ceil((x - grid.left) / bandWidth) - 1
+        i = Math.ceil((x - gridLeft) / bandWidth) - 1
       } else {
-        i = Math.floor((y - grid.bottom) / bandWidth) - 1
+        i = Math.floor((y - gridBottom) / bandWidth) - 1
       }
 
       i = orient === 'v' ? l - i - 1 : i

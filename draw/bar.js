@@ -6,7 +6,8 @@ import {
   isFunction,
 } from 'mytoolkit'
 import {
-  getData
+  getData,
+  maybePercentValue,
 } from '../utils'
 import drawGradient from './gradient'
 
@@ -32,9 +33,13 @@ export default function drawBar(chart, layer, s, index) {
     scaleX,
   } = chart
 
-  let scaleCategory, scaleValue, orient, barWidth, barOffset
+  let scaleCategory, scaleValue, orient, barWidth, barOffset, gridLeft, gridRight, gridTop, gridBottom
   barWidth = s._barWidth
   barOffset = s._barOffset
+  gridLeft = maybePercentValue(grid.left, cw)
+  gridRight = maybePercentValue(grid.right, cw)
+  gridTop = maybePercentValue(grid.top, ch)
+  gridBottom = maybePercentValue(grid.bottom, ch)
 
   if (scaleX.bandwidth) {
     scaleCategory = scaleX
@@ -93,14 +98,14 @@ export default function drawBar(chart, layer, s, index) {
         if (orient === 'h') {
           x = scaleCategory(getData(xAxis.data, i)) + barOffset + barWidth * 0.5
           y = scaleValue(d)
-          y1 = ch - grid.bottom
+          y1 = ch - gridBottom
           width = barWidth
           height = y1 - y
           barTween.attr('transform', `translate(${x}, ${y + height * 0.5})`)
         } else {
           x = scaleValue(d)
           y = scaleCategory(getData(yAxis.data, i)) + barOffset + barWidth * 0.5
-          x1 = grid.left
+          x1 = gridLeft
           width = x - x1
           height = barWidth
           barTween.attr('transform', `translate(${x - width * 0.5}, ${y})`)
@@ -160,7 +165,7 @@ export default function drawBar(chart, layer, s, index) {
           .attr('height', height)
           .attr('width', function (d, i) {
             let x = position(d, i, true)
-            return stacked ? x - scaleValue(d[0]) : x - grid.left
+            return stacked ? x - scaleValue(d[0]) : x - gridLeft
           })
           .on('start', function () {
             barRect.attr('tweening', 1)
