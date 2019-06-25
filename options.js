@@ -51,7 +51,8 @@ export default function options() {
       fontSize: 12,
       fontWeight: 555,
       lineHeight: 20,
-      iconSize: 12
+      iconSize: 12,
+      iconPadding: 10,
     },
     series: [],
   }

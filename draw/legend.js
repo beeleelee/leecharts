@@ -49,11 +49,11 @@ export default function drawLegend(chart) {
     .join('g.lc-legend-item-wrap')
     .each(function (d, i) {
       let ele = d3.select(this)
-      let html = '', x = iconSize + 6, formatter
+      let html = '', x = iconSize + legend.iconPadding, formatter
       formatter = isFunction(d.formatter) ? d.formatter : () => d.name
       html += icon(d, i)
       if (d.icon === 'lineCircle') {
-        x = iconSize * 1.8 + 6
+        x = iconSize * 1.8 + legend.iconPadding
       }
       html += `<text x=${x} y=${fontSize} style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${formatter()}</text>`
       ele.html(html)
@@ -101,13 +101,14 @@ export default function drawLegend(chart) {
 
     rows.forEach((row, rowIndex) => {
       let right = legend.align === 'right'
-      right && (penX = layoutRight)
+      right ? (penX = layoutRight) : (penX = layoutX)
       for (let i = 0, l = row.length; i < l; i++) {
         let item
         if (right) {
           item = row[l - 1 - i]
-          penX -= (item.width + legend.padding)
+          penX -= item.width
           item.ele.attr('transform', `translate(${penX},${penY})`)
+          penX -= legend.padding
         } else {
           item = row[i]
           item.ele.attr('transform', `translate(${penX},${penY})`)
