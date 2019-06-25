@@ -41,6 +41,7 @@ export default function drawLegend(chart) {
   let fontSize = legend.fontSize
   let lineHeight = legend.lineHeight
   let iconSize = legend.iconSize
+  lineHeight = Math.max(fontSize * 1.4, iconSize * 1.4, lineHeight)
   let fontWeight = legend.fontWeight
   let legendWraps = []
   legendLayer.selectAll('g.lc-legend-item-wrap')
@@ -144,7 +145,9 @@ export default function drawLegend(chart) {
         r += `<circle stroke-width="2" stroke="${iconColor}" fill="#ffffff" cx="${iconSize * 0.9}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
       case 'rect':
-        r += `<rect stroke="none" fill="${iconColor}" y="${(iconSize + 1 - fontSize)}" width="${iconSize}" height="${iconSize}"/>`
+        let halfHeight = 0.5 * (iconSize - 2 - fontSize)
+
+        r += `<rect stroke="none" fill="${iconColor}" y="${-halfHeight}" width="${iconSize}" height="${iconSize}"/>`
         return r
       case 'circle':
         r += `<circle stroke="none" fill="${iconColor}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
