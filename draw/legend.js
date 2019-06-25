@@ -2,6 +2,9 @@ import {
   isString,
   isFunction,
 } from "mytoolkit"
+import {
+  maybePercentValue,
+} from "../utils"
 
 export default function drawLegend(chart) {
   let {
@@ -9,7 +12,7 @@ export default function drawLegend(chart) {
     emitter,
     defaultOptions,
     containerWidth: cw,
-    contianerHeight: ch,
+    containerHeight: ch,
     options: {
       legend,
       series,
@@ -37,7 +40,12 @@ export default function drawLegend(chart) {
   })
 
   // set legend layer invisiable 
-  // legendLayer.style('opacity', 0)
+  let legendTop, legendLeft, legendRight, legendBottom
+  legendTop = maybePercentValue(legend.top, ch)
+  legendLeft = maybePercentValue(legend.left, cw)
+  legendRight = maybePercentValue(legend.right, cw)
+  legendBottom = maybePercentValue(legend.bottom, ch)
+
   let fontSize = legend.fontSize
   let lineHeight = legend.lineHeight
   let iconSize = legend.iconSize
@@ -75,13 +83,13 @@ export default function drawLegend(chart) {
     })
 
   // legend layout 
-  let layoutX = legend.left + legend.padding
-  let layoutRight = cw - legend.right - legend.padding
-  let layoutWidth = cw - legend.right - legend.padding - layoutX
+  let layoutX = legendLeft + legend.padding
+  let layoutRight = cw - legendRight - legend.padding
+  let layoutWidth = cw - legendRight - legend.padding - layoutX
   let penX, penY, leftSpace, rows = [[]], rowIndex = 0
 
   penX = layoutX
-  penY = legend.top + lineHeight / 2
+  penY = legendTop + lineHeight / 2
   if (legend.layout === 'horizontal') {
     leftSpace = layoutWidth
 

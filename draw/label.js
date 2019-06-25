@@ -10,7 +10,7 @@ export default function drawLabel(chart, layer, opts, i) {
     emitter,
     defaultOptions,
     containerWidth: cw,
-    contianerHeight: ch,
+    containerHeight: ch,
 
   } = chart
 
