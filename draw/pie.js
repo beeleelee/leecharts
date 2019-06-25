@@ -52,6 +52,7 @@ export default function drawPie(chart, layer, s, index) {
       let itemData = data[i]
       return drawGradient(chart, itemData.color, defaultOptions.getColor(i))
     })
+    .style('opacity', isSet(s.opacity) ? s.opacity : 1)
     .on('click', function (d, i) {
       if (!isSet(s.click) || s.click) {
         emitter.emit('clickItem', {
