@@ -283,7 +283,7 @@ class chart {
       this.maxValueFixed = true
       return
     }
-    let sArray = series.filter(s => s.type === 'bar' || s.type === 'line')
+    let sArray = series.filter(s => s.type === 'bar' || s.type === 'line' || s.type === 'point')
     let maxValue = 0
     sArray.forEach(s => {
       let d = s.data || []
