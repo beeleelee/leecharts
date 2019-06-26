@@ -63,7 +63,7 @@ export default function drawLegend(chart) {
       if (d.icon === 'lineCircle') {
         x = iconSize * 1.8 + legend.iconPadding
       }
-      html += `<text x=${x} y=${fontSize} style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${formatter()}</text>`
+      html += `<text x=${x} y=${fontSize} fill="${legend.color}" style="cursor:pointer;font-size: ${fontSize}px;font-weight: ${fontWeight};">${formatter()}</text>`
       ele.html(html)
 
       let { width, height } = ele.node().getBBox()

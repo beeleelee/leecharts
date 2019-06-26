@@ -47,6 +47,7 @@ export default function options() {
       right: 10,
       top: 0,
       bottom: 0,
+      color: '#505158',
       padding: 15,
       fontSize: 12,
       fontWeight: 555,

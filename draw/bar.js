@@ -74,7 +74,7 @@ export default function drawBar(chart, layer, s, index) {
     .each(function (d, i) {
       let bar = d3.select(this)
       let x, y, y1, x1, width, height
-
+      let barColorByData = s.data[i].color || barColor
       let barTween = bar.transition()
         .duration(chart.firstRender ? 0 : tDuration)
         .ease(defaultOptions.enterAniEase)
@@ -122,17 +122,8 @@ export default function drawBar(chart, layer, s, index) {
         x: () => {
           return width * -0.5
         },
-        // y: () => {
-        //   return orient === 'h' ? height * 0.5 : height * -0.5
-        // },
-        // width: function () {
-        //   return orient === 'h' ? width : preBarWidth
-        // },
-        // height: function () {
-        //   return orient === 'v' ? height : preBarHeight
-        // },
         stroke: 'none',
-        fill: barColor
+        fill: barColorByData
       })
       if (orient === 'h') {
         if (chart.firstRender) {
