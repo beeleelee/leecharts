@@ -36,6 +36,9 @@ export default function drawPie(chart, layer, s, index) {
   if (!s.sort) {
     arcs.sortValues(null)
   }
+  let startAngle = s.startAngle || 0, endAngle = s.endAngle || Math.PI * 2
+  arcs.startAngle(startAngle)
+  arcs.endAngle(endAngle)
   arcs = arcs(data.map(item => item.value))
 
   let d3arc = d3.arc()
