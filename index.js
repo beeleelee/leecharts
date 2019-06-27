@@ -47,6 +47,7 @@ class chart {
     this.maxValue = 0
     this.firstRender = true
     this.maybePercentValue = maybePercentValue
+    this.gradientPool = []
 
     let resize = this.resize.bind(this)
     this.resize = debounce(resize, 100)

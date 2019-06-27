@@ -6,13 +6,13 @@ import {
   encodeJSON,
 } from 'mytoolkit'
 
-let gradientPool = []
 
 export default function drawGradient(chart, color, defaultColor) {
   let {
     sections: {
       defs
-    }
+    },
+    gradientPool
   } = chart
   if (isUnset(color)) {
     return defaultColor
