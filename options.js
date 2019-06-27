@@ -118,7 +118,8 @@ options.strokeDasharray = "6 3"
 options.plot = {
   show: true,
   type: 'circle',
-  size: 10
+  size: 10,
+  lineWidth: 1,
 }
 
 options.bgCircleOpacity = 0.4
@@ -128,7 +129,8 @@ options.areaStyle = {
 }
 options.lineStyle = {
   show: true,
-  curve: false
+  curve: false,
+  width: 1
 }
 
 options.highlightOtherOpacity = 0.2

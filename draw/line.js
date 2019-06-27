@@ -22,6 +22,8 @@ export default function drawLine(chart, layer, s, index) {
       xAxis,
       yAxis,
       onClick: clickHandle,
+      lineStyle: ls,
+      plotStyle: plts,
     },
     sections: {
       defs,
@@ -35,7 +37,7 @@ export default function drawLine(chart, layer, s, index) {
     gridTop,
     gridBottom,
   } = chart
-  let lineStyle = extend({}, defaultOptions.lineStyle, (s.lineStyle || {}))
+  let lineStyle = extend({}, defaultOptions.lineStyle, (ls || {}), (s.lineStyle || {}))
   let color = lineStyle.color || defaultOptions.getColor(index)
 
   let scaleCategory, scaleValue, orient
@@ -147,7 +149,7 @@ export default function drawLine(chart, layer, s, index) {
     lineStyle.curve && line.curve(d3.curveCardinal)
 
     let lineEle = layer.safeSelect('path.lc-line')
-      .attrs({ stroke: color, fill: 'none' })
+      .attrs({ stroke: color, fill: 'none', 'stroke-width': lineStyle.width })
 
     if (chart.firstRender) {
       lineEle.attr('d', line(sData))
@@ -180,11 +182,10 @@ export default function drawLine(chart, layer, s, index) {
     }
   }
 
-  let plotStyle = extend({}, defaultOptions.plot, s.plotStyle || {})
+  let plotSetting = extend({}, defaultOptions.plot, (plts || {}), (s.plotStyle || {}))
   let currentPlotGroup
-  if (plotStyle.show) {
+  if (plotSetting.show) {
     currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
-    let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
     let r = plotSetting.size / 2
 
     currentPlotGroup.on('click', () => {
@@ -206,7 +207,7 @@ export default function drawLine(chart, layer, s, index) {
 
 
         let node = wrap.safeSelect('circle.lc-node')
-        node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color })
+        node.attrs({ r: d => d ? r : 0, fill: '#ffffff', stroke: color, 'stroke-width': plotSetting.lineWidth })
           .on('mouseover', () => {
             bgCircle
               .attr('opacity', defaultOptions.bgCircleOpacity)
