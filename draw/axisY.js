@@ -101,7 +101,7 @@ export default function axisY(chart) {
           if (isFunction(axisLabelSetting.formatter)) {
             return axisLabelSetting.formatter(d)
           }
-          return addComma(d)
+          return /^\d+$/.test(d) ? addComma(d) : d
         })
         .attrs({
           'text-anchor': 'end',
