@@ -160,7 +160,7 @@ export default function drawPie(chart, layer, s, index) {
   } else {
     //pieItems.attr('d', d3arc)
     pieItems.transition()
-      .duration(defaultOptions.changeAniDuration)
+      .duration(defaultOptions.changeAniDuraiton)
       .ease(defaultOptions.enterAniEase)
       .attrTween('d', function (d, i) {
         let ele = d3.select(this)
