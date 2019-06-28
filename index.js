@@ -29,6 +29,7 @@ import drawTooltip from './draw/tooltip'
 import drawPoint from './draw/point'
 import drawCustom from './draw/custom'
 import drawLabel from './draw/label'
+import drawTreemap from './draw/treemap'
 
 d3Augment(d3)
 
@@ -144,6 +145,9 @@ class chart {
             break
           case 'custom':
             drawCustom(chart, layer, s, i)
+            break
+          case 'treemap':
+            drawTreemap(chart, layer, s, i)
             break
           default:
         }
