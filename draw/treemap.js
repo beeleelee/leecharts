@@ -1,6 +1,7 @@
 import {
   isSet,
   isUnset,
+  isObject,
   isArray,
   extend,
   randStr,
@@ -77,6 +78,34 @@ export default function drawLine(chart, layer, s, index) {
           'font-size': labelSize
         })
 
+    })
+    .on('mousemove', function (d, i) {
+      if (isObject(s.tooltip) && !s.tooltip.show) return
+
+      emitter.emit('showTooltip', {
+        type: 'item',
+        dataIndex: i,
+        data: d.data,
+        event: d3.event
+      })
+    })
+    .on('mouseout', function () {
+      if (isObject(s.tooltip) && !s.tooltip.show) return
+
+      emitter.emit('showTooltip', {
+        type: 'item',
+        data: null,
+      })
+    })
+    .on('click', function (d, i) {
+      if (!isSet(s.click) || s.click) {
+        emitter.emit('clickItem', {
+          value: d.data,
+          seriesIndex: index,
+          dataIndex: i,
+          seriesData: s
+        })
+      }
     })
 
 }
