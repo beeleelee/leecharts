@@ -342,11 +342,11 @@ class chart {
     this.maxValue = maxValue
     this.maxValueFixed = false
   }
-  setOptions(options) {
+  setOptions(options, replace) {
     if (!options) return
 
     this.preOptions = this.options
-    this.options = deepExtend(this.preOptions, options)
+    this.options = replace ? deepExtend(defaultOptions(), options) : deepExtend(this.preOptions, options)
 
     this.figureGeometry()
     this.calculateStackData()
