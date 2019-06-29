@@ -172,12 +172,12 @@ export default function drawBar(chart, layer, s, index) {
           barRect.transition()
             .duration(defaultOptions.focusAniDuration)
             .ease(defaultOptions.enterAniEase)
-            .attr('transform', 'scale(1.2, 1)')
+            .attr('transform', 'scale(1.1, 1)')
         } else {
           barRect.transition()
             .duration(defaultOptions.focusAniDuration)
             .ease(defaultOptions.enterAniEase)
-            .attr('transform', 'scale(1, 1.2)')
+            .attr('transform', 'scale(1, 1.1)')
         }
       }).on('mouseout', function () {
         if (barRect.attr('tweening') == '1') return

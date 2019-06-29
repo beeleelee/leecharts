@@ -284,12 +284,12 @@ class chart {
       if (b.stackGroupIndex > groupIdx) {
         if (b.barWidth) {
           cache.push(b.barWidth)
-          break
+        } else {
+          barMinWidth = b.barMinWidth || 0
+          barMaxWidth = Math.min(b.barMaxWidth || expectedBarWidth, barStyle.barMaxWidth)
+          barWidth = Math.min(Math.max(barMinWidth, expectedBarWidth), barMaxWidth)
+          cache.push(barWidth)
         }
-        barMinWidth = b.barMinWidth || 0
-        barMaxWidth = Math.min(b.barMaxWidth || expectedBarWidth, barStyle.barMaxWidth)
-        barWidth = Math.min(Math.max(barMinWidth, expectedBarWidth), barMaxWidth)
-        cache.push(barWidth)
         groupIdx++
       }
     }
@@ -302,7 +302,7 @@ class chart {
       }
     }
     remainSpace = Math.max(0, space - padding * (cache.length - 1)) / 2
-    console.log(remainSpace, padding, cache)
+
     barSeries.forEach(b => {
       let gIdx = b.stackGroupIndex
       b._barOffset = remainSpace + padding * gIdx + cache.slice(0, gIdx).reduce((a, b) => a + b, 0)
