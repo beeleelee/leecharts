@@ -53,7 +53,7 @@ export default function drawPoint(chart, layer, s, index) {
   let customShape = s.customShape
   let currentPlotGroup
 
-  currentPlotGroup = plotGroup.safeSelect(`g.lc-plot-group-${index}`)
+  currentPlotGroup = layer
   let plotSetting = extend({}, defaultOptions.plot, s.plot || {})
   let r = plotSetting.size / 2
 

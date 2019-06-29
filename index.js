@@ -97,6 +97,7 @@ class chart {
       label = [label]
     }
     if (label.length === 0) {
+      labelGroup.html('')
       return
     }
     labelGroup.selectAll('g.lc-label-g')
