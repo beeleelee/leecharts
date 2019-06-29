@@ -129,13 +129,26 @@ class chart {
         update => {
           return update.attr('lc-updated', 1)
         },
-        exit => exit.remove()
+        exit => {
+          exit.each(function (d, i) {
+            if (d.type === 'line') { // line chart may has plot with not in series layer
+              d3.select(`.lc-plot-group-${i}`).remove()
+            }
+            d3.select(this).remove()
+          })
+        }
       )
       .each(function (s, i) {
         let layer = d3.select(this)
+
+        // deal with series update
         let classStr = `lc-${s.type}-layer-${i}`
         if (layer.attr('lc-updated')) {
           if (!layer.classed(classStr)) {
+            if (layer.classed(`lc-line-layer-${i}`)) { // line chart may has plot in plot group
+              d3.select(`.lc-plot-group-${i}`).remove()
+            }
+
             layer
               .html('')
               .attr('class', `lc-layer ${classStr}`)
