@@ -1,4 +1,7 @@
 import {
+  isSet,
+} from 'mytoolkit'
+import {
   getData
 } from '../utils'
 import drawGradient from './gradient'
@@ -25,7 +28,11 @@ export default function drawShadowPointer(chart, index) {
     gridBottom,
   } = chart
 
-  if (axisPointer.type !== 'shadow') return
+  if (isSet(axisPointer.show) && !axisPointer.show || axisPointer.type !== 'shadow') {
+    shadowPointer
+      .style('opacity', 0)
+    return
+  }
 
   let scaleCategory, scaleValue, orient, color
   color = drawGradient(chart, axisPointer.color, defaultOptions.shadowPointerColor)

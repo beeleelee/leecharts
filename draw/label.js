@@ -15,7 +15,10 @@ export default function drawLabel(chart, layer, opts, i) {
   } = chart
 
   let html = opts.html
-  if (isUnset(html) || html === '') return
+  if (isUnset(html) || html === '') {
+    layer.html('')
+    return
+  }
 
   let align, left, top, right, bottom
   align = opts.align || 'left'

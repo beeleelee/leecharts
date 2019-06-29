@@ -27,6 +27,7 @@ export default function drawLegend(chart) {
     legendData = filteredSeries.map((s, i) => s.name || `series ${1}`)
   }
   if (!legendData.length) {
+    legendLayer.html('')
     return
   }
   // prepare legend  

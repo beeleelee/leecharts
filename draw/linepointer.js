@@ -1,4 +1,7 @@
 import {
+  isSet,
+} from 'mytoolkit'
+import {
   getData
 } from '../utils'
 
@@ -24,7 +27,10 @@ export default function drawLinePointer(chart, index) {
     gridBottom,
   } = chart
 
-  if (axisPointer.type !== 'line') return
+  if (isSet(axisPointer.show) && !axisPointer.show || axisPointer.type !== 'line') {
+    linePointer.style('opacity', 0)
+    return
+  }
 
   let scaleCategory, scaleValue, orient, color
 
