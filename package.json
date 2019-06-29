@@ -1,6 +1,6 @@
 {
   "name": "leecharts",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "basic charts build on d3",
   "main": "index.js",
   "repository": {
