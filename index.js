@@ -135,7 +135,11 @@ class chart {
         let classStr = `lc-${s.type}-layer-${i}`
         if (layer.attr('lc-updated')) {
           if (!layer.classed(classStr)) {
-            layer.html('').attr('class', `lc-layer ${classStr}`).attr('lc-updated', null)
+            layer
+              .html('')
+              .attr('class', `lc-layer ${classStr}`)
+              .attr('lc-updated', null)
+              .attr('transform', null)
           }
         } else {
           layer.classed(classStr, true)
