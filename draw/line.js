@@ -59,7 +59,7 @@ export default function drawLine(chart, layer, s, index) {
   let rData = s.data || []
   let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
-  let stacked = false
+  let stacked = false, prevData
   if (s.stackData) {
     stacked = true
     sData = s.stackData
@@ -97,7 +97,8 @@ export default function drawLine(chart, layer, s, index) {
     let areaEle = layer.safeSelect('path.lc-area')
       //.attr('d', area(sData))
       .attrs({ stroke: 'none', fill: areaColor })
-    if (chart.firstRender) {
+    prevData = decodeJSON(areaEle.attr('prevData'))
+    if (!prevData) {
       areaEle.attr('d', area(sData))
         .attr('prevData', encodeJSON(sData))
     } else {
@@ -105,8 +106,6 @@ export default function drawLine(chart, layer, s, index) {
         .duration(defaultOptions.changeAniDuraiton)
         .ease(defaultOptions.enterAniEase)
         .attrTween('d', function () {
-          let ele = d3.select(this)
-          let prevData = decodeJSON(ele.attr('prevData'))
 
           return t => {
             let interData = sData.map((p, i) => {
@@ -151,7 +150,8 @@ export default function drawLine(chart, layer, s, index) {
     let lineEle = layer.safeSelect('path.lc-line')
       .attrs({ stroke: color, fill: 'none', 'stroke-width': lineStyle.width })
 
-    if (chart.firstRender) {
+    prevData = decodeJSON(lineEle.attr('prevData'))
+    if (!prevData) {
       lineEle.attr('d', line(sData))
         .attr('prevData', encodeJSON(sData))
     } else {
@@ -159,8 +159,6 @@ export default function drawLine(chart, layer, s, index) {
         .duration(defaultOptions.changeAniDuraiton)
         .ease(defaultOptions.enterAniEase)
         .attrTween('d', function () {
-          let ele = d3.select(this)
-          let prevData = decodeJSON(ele.attr('prevData'))
 
           return t => {
             let interData = sData.map((p, i) => {

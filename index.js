@@ -121,11 +121,7 @@ class chart {
 
     seriesGroup.selectAll('g.lc-layer')
       .data(series)
-      .join(
-        enter => enter.append('g.lc-layer'),
-        update => update,
-        exit => exit.remove()
-      )
+      .join('g.lc-layer')
       .each(function (s, i) {
         let layer = d3.select(this)
         layer.classed(`lc-layer-${i}`, true)
