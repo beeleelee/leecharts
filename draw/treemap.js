@@ -37,9 +37,9 @@ export default function drawLine(chart, layer, s, index) {
     return d.value
   })
   treemapLayout(root)
-  console.log(root.descendants())
-  layer.attr('transform', `translate(${gridLeft},${gridLeft})`)
-  layer
+  let maplayout = layer.safeSelect('g.lc-treemap-layout')
+  maplayout.attr('transform', `translate(${gridLeft},${gridLeft})`)
+  maplayout
     .selectAll('g.lc-map-node')
     .data(root.descendants())
     .join('g.lc-map-node')

@@ -121,10 +121,25 @@ class chart {
 
     seriesGroup.selectAll('g.lc-layer')
       .data(series)
-      .join('g.lc-layer')
+      .join(
+        enter => {
+          return enter.append('g.lc-layer')
+        },
+        update => {
+          return update.attr('lc-updated', 1)
+        },
+        exit => exit.remove()
+      )
       .each(function (s, i) {
         let layer = d3.select(this)
-        layer.classed(`lc-layer-${i}`, true)
+        let classStr = `lc-${s.type}-layer-${i}`
+        if (layer.attr('lc-updated')) {
+          if (!layer.classed(classStr)) {
+            layer.html('').attr('class', `lc-layer ${classStr}`).attr('lc-updated', null)
+          }
+        } else {
+          layer.classed(classStr, true)
+        }
 
         switch (s.type) {
           case 'line':

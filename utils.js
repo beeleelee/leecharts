@@ -106,6 +106,9 @@ export function d3Augment(d3) {
   let appendProto = d3.selection.prototype.append
   if (!appendProto.lc_extended) {
     let append = function (name, attrs, styles) {
+      if (isUnset(name)) {
+        return appendProto.call(this, name)
+      }
       let [tagName, className] = name.split(/[.#]/)
       let s = appendProto.call(this, tagName)
       if (className) {
