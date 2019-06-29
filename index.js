@@ -14,6 +14,7 @@ import {
   groupBy,
   isFunction,
   isObject,
+  extend,
 } from 'mytoolkit'
 
 import drawAxisX from './draw/axisX'
@@ -252,7 +253,8 @@ class chart {
   calculateBarOffset() {
     let {
       options: {
-        series
+        series,
+        barStyle: barOptionStyle
       },
       scaleY,
       scaleX,
@@ -272,9 +274,10 @@ class chart {
       return
     }
     bandWidth = scaleCategory.bandwidth()
-    let b, groupIdx = -1, expectedBarWidth, groupLength, barWidth, barMinWidth, barMaxWidth, cache = []
+    let b, barStyle, groupIdx = -1, expectedBarWidth, groupLength, barWidth, barMinWidth, barMaxWidth, cache = []
     groupLength = barSeries[0]['stackGroupLength']
     expectedBarWidth = Math.max(1, (bandWidth / groupLength) - 8)
+    barStyle = extend({}, defaultOptions.barStyle, (barOptionStyle || {}))
 
     for (let i = 0, l = barSeries.length; i < l; i++) {
       b = barSeries[i]
@@ -284,17 +287,25 @@ class chart {
           break
         }
         barMinWidth = b.barMinWidth || 0
-        barMaxWidth = Math.min(b.barMaxWidth || expectedBarWidth, defaultOptions.barStyle.barMaxWidth)
+        barMaxWidth = Math.min(b.barMaxWidth || expectedBarWidth, barStyle.barMaxWidth)
         barWidth = Math.min(Math.max(barMinWidth, expectedBarWidth), barMaxWidth)
         cache.push(barWidth)
         groupIdx++
       }
     }
-    let space = Math.max(0, bandWidth - cache.reduce((a, b) => a + b)) / (groupLength + 1)
-
+    let space = Math.max(0, bandWidth - cache.reduce((a, b) => a + b))
+    let padding = 1, remainSpace
+    while (space - padding * cache.length > 0) {
+      padding += 1
+      if (padding >= barStyle.interval) {
+        break
+      }
+    }
+    remainSpace = Math.max(0, space - padding * (cache.length - 1)) / 2
+    console.log(remainSpace, padding, cache)
     barSeries.forEach(b => {
       let gIdx = b.stackGroupIndex
-      b._barOffset = space * (gIdx + 1) + cache.slice(0, gIdx).reduce((a, b) => a + b, 0)
+      b._barOffset = remainSpace + padding * gIdx + cache.slice(0, gIdx).reduce((a, b) => a + b, 0)
       b._barWidth = cache[gIdx]
     })
     //console.log(barSeries, expectedBarWidth)

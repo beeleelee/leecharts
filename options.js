@@ -144,7 +144,8 @@ options.legendIcon = (type) => {
 }
 
 options.barStyle = {
-  barMaxWidth: 60
+  barMaxWidth: 60,
+  interval: 3,
 }
 
 options.shadowPointerColor = 'rgba(125,125,125, 0.6)'
