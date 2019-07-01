@@ -308,7 +308,7 @@ class chart {
       b._barOffset = remainSpace + padding * gIdx + cache.slice(0, gIdx).reduce((a, b) => a + b, 0)
       b._barWidth = cache[gIdx]
     })
-    //console.log(barSeries, expectedBarWidth)
+    console.log(barSeries, expectedBarWidth)
   }
   calculateMaxValue() {
     let {
@@ -341,6 +341,7 @@ class chart {
     })
     this.maxValue = maxValue
     this.maxValueFixed = false
+    console.log(this.maxValue, 'max value')
   }
   setOptions(options, replace) {
     if (!options) return
