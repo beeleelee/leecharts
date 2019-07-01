@@ -8,6 +8,9 @@ import {
   decodeJSON,
   isFunction,
 } from 'mytoolkit'
+import {
+  getData,
+} from '../utils'
 import drawGradient from './gradient'
 
 export default function drawLine(chart, layer, s, index) {
@@ -64,6 +67,9 @@ export default function drawLine(chart, layer, s, index) {
   }
   let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
+  sData = sData.map(d => {
+    return Math.max(0.01, d)
+  })
   let stacked = false, prevData
   if (s.stackData) {
     stacked = true
@@ -239,7 +245,8 @@ export default function drawLine(chart, layer, s, index) {
           if (isFunction(clickHandle)) {
             clickHandle({
               type: 'itemClicked',
-              data: stacked ? d[1] - d[0] : d,
+              data: rData[i],
+              value: getData(rData, i),
               dataIndex: i,
               seriesIndex: index,
               series: s,

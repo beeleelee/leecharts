@@ -202,7 +202,8 @@ export default function drawBar(chart, layer, s, index) {
         if (isFunction(clickHandle)) {
           clickHandle({
             type: 'itemClicked',
-            data: stacked ? d[1] - d[0] : d,
+            data: rData[i],
+            value: getData(rData, i),
             dataIndex: i,
             seriesIndex: index,
             seriesData: s.data,
