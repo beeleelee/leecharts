@@ -194,9 +194,9 @@ export default function drawPie(chart, layer, s, index) {
 
 
   // draw label 
+  let label = layer.safeSelect('g.lc-pie-label')
+  label.html('')
   if (s.label && isFunction(s.label.formatter)) {
-    let label = layer.safeSelect('g.lc-pie-label')
-
     label.html(s.label.formatter(data))
   }
 }
