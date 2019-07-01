@@ -48,6 +48,10 @@ export default function drawPoint(chart, layer, s, index) {
   }
   let bandWidth = scaleCategory && scaleCategory.bandwidth ? scaleCategory.bandwidth() : 0
   let rData = s.data || []
+  if (rData.length === 0) {
+    layer.html('')
+    return
+  }
   let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
   let customShape = s.customShape

@@ -56,6 +56,11 @@ export default function drawBar(chart, layer, s, index) {
   }
   let bandWidth = scaleCategory && scaleCategory.bandwidth ? scaleCategory.bandwidth() : 0
   let rData = s.data || []
+  if (rData.length === 0) {
+    layer.html('')
+    return
+  }
+
   let sData = rData = rData.map(item => item && item.value ? item.value : item)
 
   let stacked = false

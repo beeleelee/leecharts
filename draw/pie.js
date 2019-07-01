@@ -23,7 +23,12 @@ export default function drawPie(chart, layer, s, index) {
     },
   } = chart
   let data = s.data
-  if (!data || !data.length) return
+  if (!data || !data.length) {
+    layer.html('')
+      .attr('transform', null)
+    return
+  }
+
 
   let focusAnimation = isSet(s.focusAnimation) ? s.focusAnimation : true
 

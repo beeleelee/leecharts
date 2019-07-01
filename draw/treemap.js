@@ -29,6 +29,10 @@ export default function drawLine(chart, layer, s, index) {
   let labelColor = s.labelColor || '#ffffff'
   let labelSize = s.labelSize || 12
   let treeData = s.data || []
+  if (treeData.length === 0) {
+    layer.html('')
+    return
+  }
   let root = d3.hierarchy(treeData)
   let treemapLayout = d3.treemap()
   treemapLayout.size([cw - gridLeft - gridRight, ch - gridTop - gridBottom])
