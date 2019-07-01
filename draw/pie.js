@@ -73,7 +73,10 @@ export default function drawPie(chart, layer, s, index) {
       if (isFunction(clickHandle)) {
         clickHandle({
           type: 'itemClicked',
-          data: d,
+          data: {
+            ...d,
+            ...data[i]
+          },
           dataIndex: i,
           series: s,
           seriesIndex: index,
@@ -144,7 +147,12 @@ export default function drawPie(chart, layer, s, index) {
       emitter.emit('showTooltip', {
         type: 'item',
         dataIndex: i,
-        data: d,
+        data: {
+          ...d,
+          ...data[i],
+          seriesIndex: index,
+        },
+        seriesIndex: index,
         event: d3.event
       })
     })
