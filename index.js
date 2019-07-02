@@ -222,7 +222,7 @@ class chart {
             }
             let itemStackData = Array.from({ length: item.data.length }).map(() => [])
             item.data.forEach((d, i) => {
-              d = isSet(d) ? (d.value ? d.value : d) : 0
+              d = isSet(d) ? (isSet(d.value) ? d.value : d) : 0
               let isd = itemStackData[i]
               isd[0] = stackedData[i]
               isd[1] = stackedData[i] + d

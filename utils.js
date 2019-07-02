@@ -1,11 +1,12 @@
 import {
   isObject,
   isUnset,
+  isSet,
 } from 'mytoolkit'
 
 export function getData(arr, index) {
   let item = arr[index]
-  return item && item.value ? item.value : item
+  return item && isSet(item.value) ? item.value : item
 }
 
 export function maybePercentValue(value, target) {
