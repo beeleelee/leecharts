@@ -104,6 +104,7 @@ export default function axisX(chart) {
         })
         .attrs({
           'text-anchor': axisLabelSetting.textAnchor || 'middle',
+          'writing-mode': axisLabelSetting.writingMode || 'inherit',
           stroke: 'none',
           fill: axisLabelSetting.color,
           transform: `rotate(${axisLabelSetting.rotate})`
