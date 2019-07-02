@@ -1,6 +1,7 @@
 import {
   isString,
   isFunction,
+  isSet,
 } from "mytoolkit"
 import {
   maybePercentValue,
@@ -21,6 +22,10 @@ export default function drawLegend(chart) {
       legend: legendLayer
     }
   } = chart
+  if (isSet(legend.show) && !legend.show) {
+    legendLayer.html('')
+    return
+  }
   let legendData = legend.data || []
   let filteredSeries = series.filter(s => s.type === 'line' || s.type === 'bar')
   if (!legendData.length) {
