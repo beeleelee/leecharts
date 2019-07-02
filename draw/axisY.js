@@ -104,7 +104,7 @@ export default function axisY(chart) {
           return /^\d+$/.test(d) ? addComma(d) : d
         })
         .attrs({
-          'text-anchor': 'end',
+          'text-anchor': axisLabelSetting.textAnchor || 'end',
           stroke: 'none',
           fill: axisLabelSetting.color,
           transform: `rotate(${axisLabelSetting.rotate})`

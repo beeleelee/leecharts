@@ -103,7 +103,7 @@ export default function axisX(chart) {
           return /^\d+$/.test(d) ? addComma(d) : d
         })
         .attrs({
-          'text-anchor': 'middle',
+          'text-anchor': axisLabelSetting.textAnchor || 'middle',
           stroke: 'none',
           fill: axisLabelSetting.color,
           transform: `rotate(${axisLabelSetting.rotate})`

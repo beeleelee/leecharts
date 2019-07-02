@@ -111,7 +111,7 @@ options.axisLabel = {
   fontSize: 12,
   color: '#aaa',
   padding: 10,
-  rotate: 0
+  rotate: 0,
 }
 options.strokeDasharray = "6 3"
 
