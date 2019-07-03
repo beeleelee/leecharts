@@ -31,6 +31,7 @@ import drawPoint from './draw/point'
 import drawCustom from './draw/custom'
 import drawLabel from './draw/label'
 import drawTreemap from './draw/treemap'
+import drawRadar from './draw/radar'
 
 d3Augment(d3)
 
@@ -178,6 +179,9 @@ class chart {
             break
           case 'treemap':
             drawTreemap(chart, layer, s, i)
+            break
+          case 'radar':
+            drawRadar(chart, layer, s, i)
             break
           default:
         }
