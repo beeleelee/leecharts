@@ -8,10 +8,12 @@ import {
   extend,
   deepCopy,
   deg2angle,
+  toFixed,
 } from 'mytoolkit'
 import {
   parsePercent,
   deepExtend,
+  getData,
 } from '../utils'
 import drawGradient from './gradient'
 
@@ -39,6 +41,19 @@ export default function drawRadar(chart, layer, s, index) {
       .attr('transform', null)
     return
   }
+  let maxValue = 0
+  data.forEach(item => {
+    let d = item.data || []
+    for (let i = 0, l = d.length; i < l; i++) {
+      maxValue = Math.max(maxValue, getData(d, i))
+    }
+
+  })
+  maxValue = Math.round(maxValue * 1.2)
+  maxValue = Math.ceil(maxValue / Math.pow(10, (String(maxValue).length - 1))) * Math.pow(10, (String(maxValue).length - 1))
+  if (s.maxValue) {
+    maxValue = Number(s.maxValue)
+  }
 
 
   let focusAnimation = isSet(s.focusAnimation) ? s.focusAnimation : true
@@ -56,6 +71,8 @@ export default function drawRadar(chart, layer, s, index) {
   let radarRoot = layer.safeSelect('g.lc-radar-root').attr('transform', `translate(${radarCenter[0]}, ${radarCenter[1]})`)
   let splitAreaColors = radarSettings.splitArea.colors || []
   splitAreaColors = splitAreaColors.slice(0, radarSettings.splitNumber + 1)
+  let scaleRadius = d3.scaleLinear().domain([0, maxValue]).range([0, radius])
+
 
   // draw split area and lne
   radarRoot.selectAll('path.lc-radar-split-area')
@@ -130,11 +147,62 @@ export default function drawRadar(chart, layer, s, index) {
   // draw axis label 
   let axisLabelGroup = radarRoot.safeSelect('g.lc-radar-axis-label-group')
   if (radarSettings.axisLabel.show) {
+    axisLabelGroup.selectAll('text')
+      .data(d3.range(radarSettings.splitNumber))
+      .join('text')
+      .text(d => {
+        let v = scaleRadius.invert((d + 1) * splitLength)
 
+        return toFixed(v, 0)
+      })
+      .attrs({
+        y: d => -(d + 1) * splitLength - 5,
+        fill: radarSettings.axisLabel.color,
+        'text-anchor': 'middle',
+      })
+      .styles({
+        'font-size': radarSettings.axisLabel.fontSize
+      })
   } else {
     axisLabelGroup.remove()
   }
 
+  let sectionGroups = radarRoot.selectAll('g.lc-radar-section')
+    .data(data)
+    .join('g.lc-radar-section')
+    .each(function (sd, si) {
+      let section = d3.select(this)
+      let sdData = []
+      sdData = indicator.map((_, i) => {
+        return getData((sd.data || []), i)
+      })
+      let plotPoints = sdData.map((v, i) => {
+        let r = scaleRadius(v)
+        let angle = startAngle + i * meanAngle
+        return [r * Math.cos(angle), r * Math.sin(angle)]
+      })
+      let color = sd.color || defaultOptions.getColor(si)
+      let areaColor = 'none'
+      if (sd.areaStyle && sd.areaStyle.show) {
+        areaColor = drawGradient(chart, sd.areaStyle.color, defaultOptions.getAreaColor(si))
+      }
+
+      section.safeSelect('path')
+        .attrs({
+          stroke: color,
+          fill: areaColor,
+        })
+        .transition()
+        .duration(defaultOptions.changeAniDuraiton)
+        .ease(defaultOptions.enterAniEase)
+        .attrTween('d', d => {
+          return t => {
+            let ps = plotPoints.map(item => [item[0] * t, item[1] * t])
+
+            return d3.line()(ps) + 'Z'
+          }
+        })
+    })
   // let arcs = d3.pie()
   // if (!s.sort) {
   //   arcs.sortValues(null)

@@ -163,7 +163,9 @@ options.radar = {
     show: true
   },
   axisLabel: {
-    show: false
+    show: false,
+    color: '#ddd',
+    fontSize: 12
   },
   indicator: {
     color: '#ddd',
