@@ -3,14 +3,19 @@ import {
   isObject,
   isFunction,
   decodeJSON,
-  encodeJSON
+  encodeJSON,
+  drawEquilateral,
+  extend,
+  deepCopy,
+  deg2angle,
 } from 'mytoolkit'
 import {
-  parsePercent
+  parsePercent,
+  deepExtend,
 } from '../utils'
 import drawGradient from './gradient'
 
-export default function drawPie(chart, layer, s, index) {
+export default function drawRadar(chart, layer, s, index) {
   let {
     emitter,
     defaultOptions,
@@ -22,6 +27,12 @@ export default function drawPie(chart, layer, s, index) {
       onClick: clickHandle
     },
   } = chart
+  let indicator = s.indicator
+  if (!indicator || !indicator.length) {
+    layer.html('')
+      .attr('transform', null)
+    return
+  }
   let data = s.data
   if (!data || !data.length) {
     layer.html('')
@@ -32,179 +43,266 @@ export default function drawPie(chart, layer, s, index) {
 
   let focusAnimation = isSet(s.focusAnimation) ? s.focusAnimation : true
 
-  let pieCenter = s.center || [0.5, 0.5]
-  pieCenter = [cw * parsePercent(pieCenter[0]), ch * parsePercent(pieCenter[1])]
-  let radius = s.radius || [0, 0.7]
-  let innerRadius = Math.min(cw, ch) * parsePercent(radius[0]) * 0.5
-  let outerRadius = Math.min(cw, ch) * parsePercent(radius[1]) * 0.5
-  let arcs = d3.pie()
-  if (!s.sort) {
-    arcs.sortValues(null)
-  }
-  let startAngle = s.startAngle || 0, endAngle = s.endAngle || Math.PI * 2
-  arcs.startAngle(startAngle)
-  arcs.endAngle(endAngle)
-  arcs = arcs(data.map(item => item.value))
+  let radarCenter = s.center || [0.5, 0.5]
+  radarCenter = [cw * parsePercent(radarCenter[0]), ch * parsePercent(radarCenter[1])]
+  let radius = s.radius || 0.7
 
-  let d3arc = d3.arc()
-    .outerRadius(outerRadius)
-    .innerRadius(innerRadius)
+  radius = Math.min(cw, ch) * parsePercent(radius) * 0.5
+  let radarSettings = extend({}, deepExtend(deepCopy(defaultOptions.radar), (s.radar || {})))
+  let startAngle = deg2angle(radarSettings.startAngle) + deg2angle(-90)
+  let meanAngle = 2 * Math.PI / indicator.length
+  let splitLength = radius / (radarSettings.splitNumber)
 
+  let radarRoot = layer.safeSelect('g.lc-radar-root').attr('transform', `translate(${radarCenter[0]}, ${radarCenter[1]})`)
+  let splitAreaColors = radarSettings.splitArea.colors || []
+  splitAreaColors = splitAreaColors.slice(0, radarSettings.splitNumber + 1)
 
-  layer.attr('transform', `translate(${pieCenter[0]}, ${pieCenter[1]})`)
-  let pieItems = layer.selectAll('path.lc-arc')
-    .data(arcs)
-    .join('path.lc-arc')
-    .attr('item-index', (d, i) => i)
-    .attr('fill', (d, i) => {
-      let itemData = data[i]
-      return drawGradient(chart, itemData.color, defaultOptions.getColor(i))
-    })
-    .style('opacity', isSet(s.opacity) ? s.opacity : 1)
-    .on('click', function (d, i) {
-      if (!isSet(s.click) || s.click) {
-        emitter.emit('clickItem', {
-          value: d.data,
-          seriesIndex: index,
-          dataIndex: i,
-          seriesData: s
-        })
-      }
-      if (isFunction(clickHandle)) {
-        clickHandle({
-          type: 'itemClicked',
-          data: {
-            ...d,
-            ...data[i]
-          },
-          dataIndex: i,
-          series: s,
-          seriesIndex: index,
-          seriesData: s.data
-        })
-      }
-
-      if (isSet(s.clickHighlight) && !s.clickHighlight) return
-
-      let highlightIndex
-
-      if (i === chart.highlightIndex) {
-        highlightIndex = null
-      } else {
-        highlightIndex = i
-      }
-
-      chart.highlightIndex = highlightIndex
-      emitter.emit('highlightChange', highlightIndex)
-    })
-    .on('mouseover', function (d, i) {
-      if (!focusAnimation) return
-
-      let ele = d3.select(this)
-
-      let startOuter = outerRadius
-      let endOuter = outerRadius * defaultOptions.focusRate
-      ele.transition()
-        .duration(defaultOptions.focusAniDuration)
-        .ease(defaultOptions.focusPieEase)
-        .attrTween('d', () => {
-          let d = arcs[i]
-          let inter = d3.interpolate(startOuter, endOuter)
-          return t => {
-            return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
-          }
-        })
-
-    })
-    .on('mouseout', function (d, i) {
-      if (!focusAnimation) return
-
-      let ele = d3.select(this)
-
-      let startOuter = outerRadius * defaultOptions.focusRate
-      let endOuter = outerRadius
-      ele.transition()
-        .duration(defaultOptions.focusAniDuration)
-        .ease(defaultOptions.focusPieEase)
-        .attrTween('d', () => {
-          let d = arcs[i]
-          let inter = d3.interpolate(startOuter, endOuter)
-          return t => {
-            return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
-          }
-        })
-
-      if (isObject(s.tooltip) && !s.tooltip.show) return
-
-      emitter.emit('showTooltip', {
-        type: 'item',
-        data: null,
-      })
-    })
-    .on('mousemove', function (d, i) {
-      if (isObject(s.tooltip) && !s.tooltip.show) return
-
-      emitter.emit('showTooltip', {
-        type: 'item',
-        dataIndex: i,
-        data: {
-          ...d,
-          ...data[i],
-          seriesIndex: index,
-        },
-        seriesIndex: index,
-        event: d3.event
-      })
-    })
-  if (chart.firstRender && (!isSet(s.enterAnimation) || s.enterAnimation)) {
-    pieItems
-      .transition()
-      .duration(defaultOptions.enterAniDuration)
-      .ease(defaultOptions.enterAniEase)
-      .attrTween('d', function (d, i) {
-        let inter = d3.interpolate(d.startAngle, d.endAngle)
-        return t => {
-          return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
+  // draw split area and lne
+  radarRoot.selectAll('path.lc-radar-split-area')
+    .data(d3.range(radarSettings.splitNumber + 1))
+    .join('path.lc-radar-split-area')
+    .attrs({
+      stroke: radarSettings.splitArea.lineColor,
+      fill: (d) => {
+        let l = splitAreaColors.length
+        if (l > 0) {
+          return splitAreaColors[radarSettings.splitNumber - d - 1]
+        } else {
+          return 'none'
         }
-      })
-      .on('end', function (d, i) {
-        d3.select(this).attr('prevData', encodeJSON(d))
-      })
+      },
+      d: (d) => {
+        let r = splitLength * (radarSettings.splitNumber - d)
+
+        return drawEquilateral({
+          radius: r,
+          startAngle,
+          sidesNum: indicator.length
+        })
+      }
+    })
+
+  // draw axis 
+  radarRoot.selectAll('g.lc-radar-axis')
+    .data(d3.range(indicator.length))
+    .join('g.lc-radar-axis')
+    .each(function (d, i) {
+      let g = d3.select(this)
+      g.safeSelect('line')
+        .attrs({
+          stroke: radarSettings.axisLine.show ? radarSettings.axisLine.color : 'rgba(0,0,0,0)',
+          fill: 'none',
+          'stroke-dasharray': radarSettings.axisLine.type != 'dashed' ? [5, 2] : 'none',
+          x2: d => radius * Math.cos(startAngle + d * meanAngle),
+          y2: d => radius * Math.sin(startAngle + d * meanAngle)
+        })
+    })
+
+  // draw indicator 
+  radarRoot.selectAll('g.lc-radar-indicaor')
+    .data(d3.range(indicator.length))
+    .join('g.lc-radar-indicaor')
+    .each(function (d) {
+      let g = d3.select(this)
+      let x, y, angle = startAngle + d * meanAngle, textAnchor = 'start'
+      x = (radius + radarSettings.indicator.padding) * Math.cos(angle)
+      y = (radius + radarSettings.indicator.padding) * Math.sin(angle)
+
+      if (x < 0) {
+        textAnchor = 'end'
+      } else if (Math.round(x) == 0) {
+        textAnchor = 'middle'
+      }
+      g.attr('transform', `translate(${x}, ${y})`)
+
+      g.safeSelect('text')
+        .text(indicator[d].text)
+        .attrs({
+          fill: radarSettings.indicator.color,
+          'text-anchor': textAnchor,
+          y: Math.round(x) == 0 && y > 0 ? radarSettings.indicator.padding : 0
+        })
+        .styles({
+          'font-size': radarSettings.indicator.fontSize
+        })
+    })
+
+  // draw axis label 
+  let axisLabelGroup = radarRoot.safeSelect('g.lc-radar-axis-label-group')
+  if (radarSettings.axisLabel.show) {
+
   } else {
-    //pieItems.attr('d', d3arc)
-    pieItems.transition()
-      .duration(defaultOptions.changeAniDuraiton)
-      .ease(defaultOptions.enterAniEase)
-      .attrTween('d', function (d, i) {
-        let ele = d3.select(this)
-        let prevData = decodeJSON(ele.attr('prevData')) || d
-        let interStart = d3.interpolate(prevData.startAngle, d.startAngle)
-        let interEnd = d3.interpolate(prevData.endAngle, d.endAngle)
-        return t => {
-          return d3arc({ startAngle: interStart(t), endAngle: interEnd(t) })
-        }
-      })
-      .on('end', function (d, i) {
-        d3.select(this).attr('prevData', encodeJSON(d))
-      })
+    axisLabelGroup.remove()
   }
 
-  if (!isSet(s.clickHighlight) || s.clickHighlight) {
-    emitter.on('highlightChange', i => {
-      pieItems.each(function (d, idx) {
-        let targetOpacity = i !== null ? i === idx ? 1 : defaultOptions.highlightOtherOpacity : 1
-        d3.select(this).transition()
-          .duration(defaultOptions.focusAniDuration)
-          .style('opacity', targetOpacity)
-      })
-    })
-  }
+  // let arcs = d3.pie()
+  // if (!s.sort) {
+  //   arcs.sortValues(null)
+  // }
+  // let startAngle = s.startAngle || 0, endAngle = s.endAngle || Math.PI * 2
+  // arcs.startAngle(startAngle)
+  // arcs.endAngle(endAngle)
+  // arcs = arcs(data.map(item => item.value))
+
+  // let d3arc = d3.arc()
+  //   .outerRadius(outerRadius)
+  //   .innerRadius(innerRadius)
 
 
-  // draw label 
-  let label = layer.safeSelect('g.lc-pie-label')
-  label.html('')
-  if (s.label && isFunction(s.label.formatter)) {
-    label.html(s.label.formatter(data))
-  }
+  // layer.attr('transform', `translate(${pieCenter[0]}, ${pieCenter[1]})`)
+  // let pieItems = layer.selectAll('path.lc-arc')
+  //   .data(arcs)
+  //   .join('path.lc-arc')
+  //   .attr('item-index', (d, i) => i)
+  //   .attr('fill', (d, i) => {
+  //     let itemData = data[i]
+  //     return drawGradient(chart, itemData.color, defaultOptions.getColor(i))
+  //   })
+  //   .style('opacity', isSet(s.opacity) ? s.opacity : 1)
+  //   .on('click', function (d, i) {
+  //     if (!isSet(s.click) || s.click) {
+  //       emitter.emit('clickItem', {
+  //         value: d.data,
+  //         seriesIndex: index,
+  //         dataIndex: i,
+  //         seriesData: s
+  //       })
+  //     }
+  //     if (isFunction(clickHandle)) {
+  //       clickHandle({
+  //         type: 'itemClicked',
+  //         data: {
+  //           ...d,
+  //           ...data[i]
+  //         },
+  //         dataIndex: i,
+  //         series: s,
+  //         seriesIndex: index,
+  //         seriesData: s.data
+  //       })
+  //     }
+
+  //     if (isSet(s.clickHighlight) && !s.clickHighlight) return
+
+  //     let highlightIndex
+
+  //     if (i === chart.highlightIndex) {
+  //       highlightIndex = null
+  //     } else {
+  //       highlightIndex = i
+  //     }
+
+  //     chart.highlightIndex = highlightIndex
+  //     emitter.emit('highlightChange', highlightIndex)
+  //   })
+  //   .on('mouseover', function (d, i) {
+  //     if (!focusAnimation) return
+
+  //     let ele = d3.select(this)
+
+  //     let startOuter = outerRadius
+  //     let endOuter = outerRadius * defaultOptions.focusRate
+  //     ele.transition()
+  //       .duration(defaultOptions.focusAniDuration)
+  //       .ease(defaultOptions.focusPieEase)
+  //       .attrTween('d', () => {
+  //         let d = arcs[i]
+  //         let inter = d3.interpolate(startOuter, endOuter)
+  //         return t => {
+  //           return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
+  //         }
+  //       })
+
+  //   })
+  //   .on('mouseout', function (d, i) {
+  //     if (!focusAnimation) return
+
+  //     let ele = d3.select(this)
+
+  //     let startOuter = outerRadius * defaultOptions.focusRate
+  //     let endOuter = outerRadius
+  //     ele.transition()
+  //       .duration(defaultOptions.focusAniDuration)
+  //       .ease(defaultOptions.focusPieEase)
+  //       .attrTween('d', () => {
+  //         let d = arcs[i]
+  //         let inter = d3.interpolate(startOuter, endOuter)
+  //         return t => {
+  //           return d3.arc().innerRadius(innerRadius).outerRadius(inter(t))(d)
+  //         }
+  //       })
+
+  //     if (isObject(s.tooltip) && !s.tooltip.show) return
+
+  //     emitter.emit('showTooltip', {
+  //       type: 'item',
+  //       data: null,
+  //     })
+  //   })
+  //   .on('mousemove', function (d, i) {
+  //     if (isObject(s.tooltip) && !s.tooltip.show) return
+
+  //     emitter.emit('showTooltip', {
+  //       type: 'item',
+  //       dataIndex: i,
+  //       data: {
+  //         ...d,
+  //         ...data[i],
+  //         seriesIndex: index,
+  //       },
+  //       seriesIndex: index,
+  //       event: d3.event
+  //     })
+  //   })
+  // if (chart.firstRender && (!isSet(s.enterAnimation) || s.enterAnimation)) {
+  //   pieItems
+  //     .transition()
+  //     .duration(defaultOptions.enterAniDuration)
+  //     .ease(defaultOptions.enterAniEase)
+  //     .attrTween('d', function (d, i) {
+  //       let inter = d3.interpolate(d.startAngle, d.endAngle)
+  //       return t => {
+  //         return d3arc({ startAngle: d.startAngle, endAngle: inter(t) })
+  //       }
+  //     })
+  //     .on('end', function (d, i) {
+  //       d3.select(this).attr('prevData', encodeJSON(d))
+  //     })
+  // } else {
+  //   //pieItems.attr('d', d3arc)
+  //   pieItems.transition()
+  //     .duration(defaultOptions.changeAniDuraiton)
+  //     .ease(defaultOptions.enterAniEase)
+  //     .attrTween('d', function (d, i) {
+  //       let ele = d3.select(this)
+  //       let prevData = decodeJSON(ele.attr('prevData')) || d
+  //       let interStart = d3.interpolate(prevData.startAngle, d.startAngle)
+  //       let interEnd = d3.interpolate(prevData.endAngle, d.endAngle)
+  //       return t => {
+  //         return d3arc({ startAngle: interStart(t), endAngle: interEnd(t) })
+  //       }
+  //     })
+  //     .on('end', function (d, i) {
+  //       d3.select(this).attr('prevData', encodeJSON(d))
+  //     })
+  // }
+
+  // if (!isSet(s.clickHighlight) || s.clickHighlight) {
+  //   emitter.on('highlightChange', i => {
+  //     pieItems.each(function (d, idx) {
+  //       let targetOpacity = i !== null ? i === idx ? 1 : defaultOptions.highlightOtherOpacity : 1
+  //       d3.select(this).transition()
+  //         .duration(defaultOptions.focusAniDuration)
+  //         .style('opacity', targetOpacity)
+  //     })
+  //   })
+  // }
+
+
+  // // draw label 
+  // let label = layer.safeSelect('g.lc-pie-label')
+  // label.html('')
+  // if (s.label && isFunction(s.label.formatter)) {
+  //   label.html(s.label.formatter(data))
+  // }
 }

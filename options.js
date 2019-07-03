@@ -149,3 +149,25 @@ options.barStyle = {
 }
 
 options.shadowPointerColor = 'rgba(125,125,125, 0.6)'
+
+options.radar = {
+  startAngle: 0,
+  splitNumber: 5,
+  splitArea: {
+    colors,
+    lineType: 'dashed',
+    lineColor: '#ddd'
+  },
+  axisLine: {
+    color: '#ddd',
+    show: true
+  },
+  axisLabel: {
+    show: false
+  },
+  indicator: {
+    color: '#ddd',
+    fontSize: 12,
+    padding: 10
+  }
+}
