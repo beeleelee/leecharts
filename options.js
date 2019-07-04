@@ -171,5 +171,15 @@ options.radar = {
     color: '#ddd',
     fontSize: 12,
     padding: 10
+  },
+  plots: {
+    show: true,
+    type: 'circle',
+    attr: {
+      r: 5
+    },
+    style: {
+      opacity: 1
+    }
   }
 }

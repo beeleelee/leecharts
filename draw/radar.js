@@ -195,13 +195,52 @@ export default function drawRadar(chart, layer, s, index) {
         .transition()
         .duration(defaultOptions.changeAniDuraiton)
         .ease(defaultOptions.enterAniEase)
-        .attrTween('d', d => {
+        .attrTween('d', function () {
+          let prevData = decodeJSON(d3.select(this).attr('prevData'))
           return t => {
-            let ps = plotPoints.map(item => [item[0] * t, item[1] * t])
+            let ps
+            if (!prevData || prevData.length !== plotPoints.length) {
+              ps = plotPoints.map(item => [item[0] * t, item[1] * t])
+            } else {
+              ps = plotPoints.map((item, k) => {
+                let prevItem = prevData[k]
+                let x = t * plotPoints[0] + (1 - t) * prevItem[0]
+                let y = t * plotPoints[1] + (1 - t) * prevItem[1]
+                return [x, y]
+              })
+            }
 
             return d3.line()(ps) + 'Z'
           }
         })
+        .on('end', function () {
+          d3.select(this).attr('prevData', encodeJSON(plotPoints))
+        })
+
+      let plots = section.selectAll('g.lc-radar-plot-group')
+        .data(plotPoints)
+        .join('g.lc-radar-plot-group')
+      if (radarSettings.plots.show) {
+        plots.each(function (d, i) {
+          let g = d3.select(this)
+          g.safeSelect('circle')
+            .attrs({
+              stroke: color,
+              fill: '#ffffff',
+              ...radarSettings.plots.attr
+            })
+            .styles({
+              ...radarSettings.plots.style
+            })
+        })
+        plots.transition()
+          .duration(defaultOptions.changeAniDuraiton)
+          .ease(defaultOptions.enterAniEase)
+          .attr('transform', d => `translate(${d[0]}, ${d[1]})`)
+
+      } else {
+        plots.remove()
+      }
     })
   // let arcs = d3.pie()
   // if (!s.sort) {
