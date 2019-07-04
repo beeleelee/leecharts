@@ -1,5 +1,6 @@
 import {
   isSet,
+  isUnset,
   isObject,
   isFunction,
   decodeJSON,
@@ -116,9 +117,9 @@ export default function drawRadar(chart, layer, s, index) {
     })
 
   // draw indicator 
-  radarRoot.selectAll('g.lc-radar-indicaor')
+  radarRoot.selectAll('g.lc-radar-indicator')
     .data(d3.range(indicator.length))
-    .join('g.lc-radar-indicaor')
+    .join('g.lc-radar-indicator')
     .each(function (d) {
       let g = d3.select(this)
       let x, y, angle = startAngle + d * meanAngle, textAnchor = 'start'
@@ -241,6 +242,8 @@ export default function drawRadar(chart, layer, s, index) {
               dataIndex: i,
               data: {
                 value: sdData[i],
+                data: sdData[i],
+                indicator: indicator[i],
                 dataIndex: i,
                 seriesIndex: si,
                 seriesData: sd
@@ -265,6 +268,31 @@ export default function drawRadar(chart, layer, s, index) {
       } else {
         plots.remove()
       }
+
+      section.on('click', () => {
+        if (isSet(s.highlightAnimation) && !s.highlightAnimation) return
+
+        chart.highlightIndex = chart.highlightIndex === si ? null : si
+        emitter.emit('highlightChange', chart.highlightIndex)
+      })
+
+      if (isUnset(s.highlightAnimation) || s.highlightAnimation) {
+        emitter.on('highlightChange', (ci) => {
+          if (ci === null || ci === si) {
+            section.transition()
+              .duration(defaultOptions.focusAniDuration)
+              .style('opacity', 1)
+
+          } else {
+            section.transition()
+              .duration(defaultOptions.focusAniDuration)
+              .style('opacity', defaultOptions.highlightOtherOpacity)
+
+          }
+        })
+      }
     })
+
+
 
 }
