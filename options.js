@@ -168,7 +168,7 @@ options.radar = {
     fontSize: 12
   },
   indicator: {
-    color: '#ddd',
+    color: '#505158',
     fontSize: 12,
     padding: 10
   },

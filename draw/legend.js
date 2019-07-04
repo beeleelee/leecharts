@@ -167,6 +167,9 @@ export default function drawLegend(chart) {
       case 'circle':
         r += `<circle stroke="none" fill="${iconColor}" cy="${(fontSize + 2) / 2}" r="${iconSize / 2}"/>`
         return r
+      case 'custom':
+        r += isFunction(d.drawIcon) ? d.drawIcon() : ''
+        return r
       default:
         return r
     }
