@@ -485,6 +485,14 @@ class chart {
       }
     }
   }
+  destroy() {
+    try {
+      this.emitter = null
+      this.sections.tooltip.remove()
+    } catch (error) {
+
+    }
+  }
   // bind(names) {
   //   if (isArray(names)) {
   //     names.forEach(n => {
