@@ -43,7 +43,7 @@ export default function axisX(chart) {
     category = true
   } else {
     max = maxValue
-    tickNumber = xAxis.tickNumber || defaultOptions.tickNumber
+    tickNumber = Math.min(max, xAxis.tickNumber || defaultOptions.tickNumber)
     if (!maxValueFixed) {
       tickIncrement = d3.tickIncrement(0, max, tickNumber)
       max = Math.ceil(max / tickIncrement) * tickIncrement
